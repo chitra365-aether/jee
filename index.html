@@ -1,1204 +1,1045 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-<title>JEE Dashboard</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>JEE Tracker — Preparation Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { font-family: 'Inter', -apple-system, sans-serif; box-sizing: border-box; }
-  .font-mono { font-family: 'JetBrains Mono', 'SF Mono', monospace !important; }
-  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); }
-  ::-webkit-scrollbar { display: none; }
-  html, body { margin: 0; padding: 0; background: #0A0A0A; }
+/* ============================= TOKENS ============================= */
+:root{
+  --bg:#F6F7F9;
+  --surface:#FFFFFF;
+  --surface-2:#F0F1F4;
+  --border:#E3E6EB;
+  --text:#171B23;
+  --text-muted:#6B7280;
+  --text-faint:#9AA1AC;
+  --accent:#3E63DD;
+  --accent-soft:#E9EDFD;
+  --physics:#2F6FED;
+  --physics-soft:#E7EFFE;
+  --chemistry:#0EA968;
+  --chemistry-soft:#E4F8EF;
+  --maths:#C7791A;
+  --maths-soft:#FBEEDD;
+  --danger:#E5484D;
+  --danger-soft:#FCEBEC;
+  --radius-lg:16px;
+  --radius-md:10px;
+  --radius-sm:7px;
+  --shadow-card:0 1px 2px rgba(20,24,32,.04), 0 6px 20px rgba(20,24,32,.04);
+  --shadow-pop:0 10px 30px rgba(20,24,32,.10);
+  --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',monospace;
+  color-scheme: light;
+}
+html.dark{
+  --bg:#0C0E12;
+  --surface:#14171D;
+  --surface-2:#1B1F27;
+  --border:#262B34;
+  --text:#E8EAED;
+  --text-muted:#9AA1AC;
+  --text-faint:#6B7280;
+  --accent:#6E8CF5;
+  --accent-soft:#1D2440;
+  --physics:#5B8DF9;
+  --physics-soft:#182338;
+  --chemistry:#2FD98B;
+  --chemistry-soft:#132A22;
+  --maths:#F0A93A;
+  --maths-soft:#2C2110;
+  --danger:#F5716F;
+  --danger-soft:#2B1518;
+  --shadow-card:0 1px 0 rgba(0,0,0,.2);
+  --shadow-pop:0 12px 32px rgba(0,0,0,.45);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box;}
+html,body{padding:0;margin:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  transition:background .25s ease,color .25s ease;
+}
+::selection{background:var(--accent-soft);}
+button,input{font-family:inherit;}
+button{cursor:pointer;}
+.mono{font-family:var(--font-mono);}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+}
+
+/* ============================= LAYOUT ============================= */
+.app{
+  max-width:880px;
+  margin:0 auto;
+  padding:0 16px 64px;
+}
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.topbar-inner{
+  max-width:880px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 16px 10px;
+}
+.brand{display:flex; flex-direction:column; gap:1px;}
+.brand-name{font-weight:800; font-size:17px; letter-spacing:-0.01em;}
+.brand-sub{font-size:11px; color:var(--text-faint); font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em;}
+
+.theme-toggle{
+  width:38px; height:38px; border-radius:999px;
+  border:1px solid var(--border); background:var(--surface);
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .15s ease, background .2s ease;
+  color:var(--text);
+}
+.theme-toggle:active{transform:scale(.92);}
+.theme-toggle svg{width:18px; height:18px;}
+
+.tabs{
+  display:flex; gap:4px; overflow-x:auto;
+  padding:0 16px 10px; max-width:880px; margin:0 auto;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{
+  flex:0 0 auto;
+  border:none; background:transparent;
+  color:var(--text-muted);
+  font-size:13.5px; font-weight:600;
+  padding:8px 12px; border-radius:999px;
+  white-space:nowrap;
+  transition:background .18s ease, color .18s ease;
+}
+.tab-btn:hover{background:var(--surface-2); color:var(--text);}
+.tab-btn.active{background:var(--text); color:var(--bg);}
+html.dark .tab-btn.active{background:var(--accent); color:#0C0E12;}
+
+main{padding-top:18px;}
+.panel{display:none;}
+.panel.active{display:block; animation:fadeSlideIn .38s cubic-bezier(.2,.7,.3,1);}
+@keyframes fadeSlideIn{
+  from{opacity:0; transform:translateY(8px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* ============================= CARDS ============================= */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-card);
+  transition:box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+}
+.section-title{
+  font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--text-faint); margin:26px 2px 10px;
+}
+.section-title:first-child{margin-top:0;}
+
+/* ============================= DASHBOARD ============================= */
+.hero-card{
+  padding:26px 22px 22px;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  text-align:center;
+}
+.ring-wrap{position:relative; width:172px; height:172px;}
+.ring-wrap svg{width:100%; height:100%; transform-origin:center;}
+.ring-bg{fill:none; stroke:var(--surface-2); stroke-width:11;}
+.ring-fg{fill:none; stroke:var(--accent); stroke-width:11; stroke-linecap:round; transition:stroke-dashoffset .7s cubic-bezier(.2,.7,.3,1);}
+.ring-center{
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px;
+}
+.ring-pct{font-family:var(--font-mono); font-size:34px; font-weight:700; letter-spacing:-.02em;}
+.ring-label{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em;}
+
+.hero-meta{display:flex; gap:22px; flex-wrap:wrap; justify-content:center;}
+.hero-meta-item{display:flex; flex-direction:column; align-items:center; gap:2px;}
+.hero-meta-val{font-family:var(--font-mono); font-weight:700; font-size:19px;}
+.hero-meta-key{font-size:11px; color:var(--text-faint);}
+
+.goal-bar-track{
+  width:100%; height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden;
+}
+.goal-bar-fill{
+  height:100%; border-radius:999px; background:linear-gradient(90deg, var(--accent), var(--physics));
+  transition:width .7s cubic-bezier(.2,.7,.3,1);
+}
+.goal-bar-row{width:100%; max-width:360px; display:flex; flex-direction:column; gap:6px;}
+.goal-bar-caption{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted);}
+
+.subject-progress-card{padding:18px 20px;}
+.subject-row{display:flex; align-items:center; gap:12px; padding:10px 0;}
+.subject-row + .subject-row{border-top:1px solid var(--border);}
+.subject-dot{width:9px; height:9px; border-radius:50%; flex:0 0 auto;}
+.subject-row-name{flex:1; font-weight:600; font-size:14px;}
+.subject-row-pct{font-family:var(--font-mono); font-weight:700; font-size:14px; width:44px; text-align:right;}
+.subject-bar-track{flex:2; height:7px; border-radius:999px; background:var(--surface-2); overflow:hidden;}
+.subject-bar-fill{height:100%; border-radius:999px; transition:width .6s ease;}
+
+.stat-grid{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
+}
+.stat-tile{
+  padding:16px; display:flex; flex-direction:column; gap:4px;
+}
+.stat-val{font-family:var(--font-mono); font-size:22px; font-weight:700;}
+.stat-key{font-size:12px; color:var(--text-muted);}
+
+.weak-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:999px;
+  background:var(--danger-soft); color:var(--danger);
+}
+.cta-link{
+  font-size:12.5px; font-weight:600; color:var(--accent); text-decoration:none; margin-top:2px;
+}
+
+/* ============================= SUBJECT PAGES ============================= */
+.subject-header{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;}
+.subject-title{display:flex; align-items:baseline; gap:10px;}
+.subject-title h2{margin:0; font-size:19px; font-weight:800;}
+.subject-title .mono{font-size:13px; color:var(--text-faint);}
+
+.toolbar{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+.search-input{
+  flex:1; min-width:160px;
+  border:1px solid var(--border); background:var(--surface);
+  border-radius:var(--radius-md); padding:9px 12px; font-size:13.5px; color:var(--text);
+  outline:none; transition:border-color .15s ease, box-shadow .15s ease;
+}
+.search-input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+
+.filter-seg{display:flex; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; flex:0 0 auto;}
+.filter-seg button{
+  border:none; background:var(--surface); color:var(--text-muted); font-size:12.5px; font-weight:600;
+  padding:9px 11px; border-right:1px solid var(--border); transition:background .15s ease,color .15s ease;
+}
+.filter-seg button:last-child{border-right:none;}
+.filter-seg button.active{background:var(--text); color:var(--bg);}
+html.dark .filter-seg button.active{background:var(--accent); color:#0C0E12;}
+
+.btn{
+  border:1px solid var(--border); background:var(--surface); color:var(--text);
+  border-radius:var(--radius-md); padding:9px 14px; font-size:13px; font-weight:600;
+  display:inline-flex; align-items:center; gap:6px; transition:transform .12s ease, background .15s ease, border-color .15s ease;
+}
+.btn:hover{background:var(--surface-2);}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--text); color:var(--bg); border-color:transparent;}
+html.dark .btn-primary{background:var(--accent); color:#0C0E12;}
+.btn-primary:hover{opacity:.9; background:var(--text);}
+html.dark .btn-primary:hover{background:var(--accent);}
+.btn-danger{color:var(--danger); border-color:var(--danger-soft);}
+.btn-sm{padding:6px 10px; font-size:12px;}
+
+.add-form{
+  display:flex; gap:8px; margin-bottom:14px;
+  animation:fadeSlideIn .25s ease;
+}
+
+.chapter-list{display:flex; flex-direction:column; gap:10px;}
+.chapter-card{
+  padding:16px 16px 14px;
+  animation:fadeSlideIn .3s ease;
+}
+.chapter-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+.chapter-name-row{display:flex; align-items:center; gap:8px; flex:1; min-width:0;}
+.chapter-name{font-weight:700; font-size:14.5px; line-height:1.3; word-break:break-word;}
+.chapter-name-input{
+  flex:1; border:1px solid var(--accent); border-radius:var(--radius-sm); padding:5px 8px;
+  font-size:14.5px; font-weight:700; background:var(--surface); color:var(--text); outline:none;
+}
+.chapter-actions{display:flex; gap:4px; flex:0 0 auto;}
+.icon-btn{
+  width:28px; height:28px; border-radius:8px; border:1px solid transparent; background:transparent;
+  color:var(--text-faint); display:flex; align-items:center; justify-content:center;
+  transition:background .15s ease, color .15s ease;
+}
+.icon-btn:hover{background:var(--surface-2); color:var(--text);}
+.icon-btn.danger:hover{background:var(--danger-soft); color:var(--danger);}
+.icon-btn svg{width:15px; height:15px;}
+
+.chapter-pct-row{display:flex; align-items:center; gap:8px; margin:10px 0 12px;}
+.chapter-pct{font-family:var(--font-mono); font-weight:700; font-size:13px; width:38px;}
+.segbar{display:flex; gap:3px; flex:1;}
+.seg{height:7px; border-radius:3px; flex:1; background:var(--surface-2); transition:background .2s ease;}
+
+.checklist{display:grid; grid-template-columns:repeat(2,1fr); gap:7px;}
+@media(min-width:520px){.checklist{grid-template-columns:repeat(3,1fr);}}
+.check-chip{
+  display:flex; align-items:center; gap:7px;
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:8px 9px; font-size:12.5px; font-weight:500; color:var(--text-muted);
+  background:var(--surface-2); transition:all .15s ease; user-select:none;
+}
+.check-chip:active{transform:scale(.97);}
+.check-chip .box{
+  width:15px; height:15px; border-radius:4px; border:1.5px solid var(--text-faint); flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center; transition:all .15s ease;
+}
+.check-chip.checked{color:var(--text); border-color:transparent;}
+.check-chip .box svg{width:10px; height:10px; opacity:0; transform:scale(.5); transition:all .15s ease;}
+.check-chip.checked .box svg{opacity:1; transform:scale(1);}
+
+.revised-row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-top:12px; padding-top:12px; border-top:1px solid var(--border);
+}
+.revised-label{font-size:11.5px; color:var(--text-faint);}
+.revised-input{
+  border:1px solid var(--border); background:var(--surface); color:var(--text-muted);
+  border-radius:var(--radius-sm); padding:5px 8px; font-size:12px; font-family:var(--font-mono);
+}
+
+.empty-state{
+  text-align:center; padding:40px 20px; color:var(--text-faint); font-size:13.5px;
+}
+
+/* ============================= GOAL PAGE ============================= */
+.goal-card{padding:20px; display:flex; flex-direction:column; gap:16px;}
+.field{display:flex; flex-direction:column; gap:6px;}
+.field label{font-size:12.5px; font-weight:600; color:var(--text-muted);}
+.field input{
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+  border-radius:var(--radius-md); padding:10px 12px; font-size:14px; outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.field input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); background:var(--surface);}
+.countdown-strip{
+  display:flex; align-items:baseline; gap:8px; padding:16px 18px;
+  background:var(--accent-soft); border-radius:var(--radius-md);
+}
+.countdown-num{font-family:var(--font-mono); font-size:30px; font-weight:800; color:var(--accent);}
+.countdown-txt{font-size:13px; color:var(--text-muted);}
+
+.data-actions{display:flex; gap:10px; flex-wrap:wrap;}
+.hint{font-size:12px; color:var(--text-faint); line-height:1.5;}
+
+footer{text-align:center; padding:26px 0 6px; font-size:11.5px; color:var(--text-faint);}
 </style>
 </head>
 <body>
-<div id="root"></div>
 
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useRef } = React;
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-name">JEE Tracker</div>
+      <div class="brand-sub">Preparation Dashboard</div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+    </button>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="physics">Physics</button>
+    <button class="tab-btn" data-tab="chemistry">Chemistry</button>
+    <button class="tab-btn" data-tab="maths">Mathematics</button>
+    <button class="tab-btn" data-tab="goal">Goal &amp; Data</button>
+  </div>
+</div>
 
-// ---------------------------------------------------------------------------
-// Icons (hand-drawn, stroke-based — no external icon library required)
-// ---------------------------------------------------------------------------
+<div class="app">
+  <main>
 
-function Icon({ name, size = 18, color = "currentColor", filled = false, style, className }) {
-  const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", style, className };
-  switch (name) {
-    case "plus": return <svg {...common}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>;
-    case "x": return <svg {...common}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>;
-    case "check": return <svg {...common}><polyline points="20 6 9 17 4 12" /></svg>;
-    case "chevronDown": return <svg {...common}><polyline points="6 9 12 15 18 9" /></svg>;
-    case "chevronLeft": return <svg {...common}><polyline points="15 18 9 12 15 6" /></svg>;
-    case "trash": return <svg {...common}><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>;
-    case "star": return <svg {...common} fill={filled ? color : "none"}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>;
-    case "flame": return <svg {...common}><path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-2-1-3-1-3s2 1 2 4a5 5 0 0 1-10 0c0-5 4-6 6-10z" /></svg>;
-    case "clock": return <svg {...common}><circle cx="12" cy="12" r="9" /><polyline points="12 7 12 12 15 14" /></svg>;
-    case "layoutDashboard": return <svg {...common}><rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" /></svg>;
-    case "bookOpen": return <svg {...common}><path d="M2 5c2-1 5-1 7 0v14c-2-1-5-1-7 0V5z" /><path d="M22 5c-2-1-5-1-7 0v14c2-1 5-1 7 0V5z" /></svg>;
-    case "listChecks": return <svg {...common}><line x1="9" y1="6" x2="20" y2="6" /><polyline points="3 6 4 7 6 5" /><line x1="9" y1="12" x2="20" y2="12" /><polyline points="3 12 4 13 6 11" /><line x1="9" y1="18" x2="20" y2="18" /><polyline points="3 18 4 19 6 17" /></svg>;
-    case "rotateCcw": return <svg {...common}><path d="M3 12a9 9 0 1 0 3-6.7" /><polyline points="3 4 3 9 8 9" /></svg>;
-    case "target": return <svg {...common}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></svg>;
-    case "moreHorizontal": return <svg {...common}><circle cx="5" cy="12" r="1.5" fill={color} /><circle cx="12" cy="12" r="1.5" fill={color} /><circle cx="19" cy="12" r="1.5" fill={color} /></svg>;
-    case "clipboardList": return <svg {...common}><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" /><line x1="8" y1="10" x2="16" y2="10" /><line x1="8" y1="14" x2="16" y2="14" /><line x1="8" y1="18" x2="13" y2="18" /></svg>;
-    case "barChart3": return <svg {...common}><line x1="6" y1="20" x2="6" y2="12" /><line x1="12" y1="20" x2="12" y2="6" /><line x1="18" y1="20" x2="18" y2="15" /></svg>;
-    case "grid": return <svg {...common}><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="3" y1="15" x2="21" y2="15" /><line x1="9" y1="3" x2="9" y2="21" /><line x1="15" y1="3" x2="15" y2="21" /></svg>;
-    case "sparkles": return <svg {...common}><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.5 6.5l1.8 1.8M15.7 15.7l1.8 1.8M6.5 17.5l1.8-1.8M15.7 8.3l1.8-1.8" /></svg>;
-    case "penSquare": return <svg {...common}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>;
-    case "timer": return <svg {...common}><line x1="10" y1="2" x2="14" y2="2" /><line x1="12" y1="6" x2="12" y2="2" /><circle cx="12" cy="14" r="8" /><line x1="12" y1="14" x2="15" y2="11" /></svg>;
-    case "settings": return <svg {...common}><line x1="4" y1="6" x2="20" y2="6" /><circle cx="9" cy="6" r="2" fill={color} /><line x1="4" y1="12" x2="20" y2="12" /><circle cx="15" cy="12" r="2" fill={color} /><line x1="4" y1="18" x2="20" y2="18" /><circle cx="7" cy="18" r="2" fill={color} /></svg>;
-    case "sun": return <svg {...common}><circle cx="12" cy="12" r="4" /><line x1="12" y1="2" x2="12" y2="4" /><line x1="12" y1="20" x2="12" y2="22" /><line x1="4" y1="12" x2="2" y2="12" /><line x1="22" y1="12" x2="20" y2="12" /><line x1="19.07" y1="4.93" x2="17.66" y2="6.34" /><line x1="6.34" y1="17.66" x2="4.93" y2="19.07" /><line x1="19.07" y1="19.07" x2="17.66" y2="17.66" /><line x1="6.34" y1="6.34" x2="4.93" y2="4.93" /></svg>;
-    case "moon": return <svg {...common}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
-    case "download": return <svg {...common}><path d="M12 3v12" /><polyline points="7 11 12 16 17 11" /><path d="M5 20h14" /></svg>;
-    case "upload": return <svg {...common}><path d="M12 21V9" /><polyline points="7 13 12 8 17 13" /><path d="M5 20h14" /></svg>;
-    default: return null;
-  }
-}
+    <!-- DASHBOARD -->
+    <section class="panel active" id="panel-dashboard">
+      <div class="card hero-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52" transform="rotate(-90 60 60)"></circle>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ringPct">0%</div>
+            <div class="ring-label">Overall</div>
+          </div>
+        </div>
 
-// ---------------------------------------------------------------------------
-// Minimal SVG charts (no external charting library required)
-// ---------------------------------------------------------------------------
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <div class="hero-meta-val mono" id="daysLeftVal">—</div>
+            <div class="hero-meta-key">Days left</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-val mono" id="chCompletedVal">0</div>
+            <div class="hero-meta-key">Chapters done</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-val mono" id="todayVal">0</div>
+            <div class="hero-meta-key">Today's tasks</div>
+          </div>
+        </div>
 
-function MiniBarChart({ data, valueKey, labelKey, color, height = 140 }) {
-  if (!data.length) return null;
-  const w = 320, h = height, gap = 6;
-  const max = Math.max(1, ...data.map((d) => d[valueKey]));
-  const barW = (w / data.length) - gap;
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none">
-      {data.map((d, i) => {
-        const barH = max ? (d[valueKey] / max) * (h - 24) : 0;
-        const x = i * (barW + gap) + gap / 2;
-        const y = h - 24 - barH;
-        return (
-          <g key={i}>
-            <rect x={x} y={y} width={barW} height={Math.max(barH, 1)} rx="3" fill={color} />
-            <text x={x + barW / 2} y={h - 8} fontSize="9" textAnchor="middle" fill="var(--text-tertiary)">{d[labelKey]}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
+        <div class="goal-bar-row">
+          <div class="goal-bar-caption"><span>Syllabus goal</span><span id="goalBarPct">0%</span></div>
+          <div class="goal-bar-track"><div class="goal-bar-fill" id="goalBarFill" style="width:0%"></div></div>
+        </div>
 
-function MiniLineChart({ data, valueKey, labelKey, color, height = 140, minVal = 0, maxVal }) {
-  if (!data.length) return null;
-  const w = 320, h = height, pad = 20;
-  const max = maxVal ?? Math.max(1, ...data.map((d) => d[valueKey]));
-  const range = (max - minVal) || 1;
-  const stepX = data.length > 1 ? (w - pad * 2) / (data.length - 1) : 0;
-  const points = data.map((d, i) => {
-    const x = pad + i * stepX;
-    const y = pad + (1 - (d[valueKey] - minVal) / range) * (h - pad * 2 - 16);
-    return [x, y];
-  });
-  const pathD = points.map((p, i) => (i === 0 ? "M" : "L") + p[0] + "," + p[1]).join(" ");
-  const skip = data.length > 8 ? Math.ceil(data.length / 6) : 1;
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none">
-      <path d={pathD} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      {points.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r="2.5" fill={color} />)}
-      {data.map((d, i) => {
-        if (i % skip !== 0 && i !== data.length - 1) return null;
-        const x = pad + i * stepX;
-        return <text key={i} x={x} y={h - 4} fontSize="9" textAnchor="middle" fill="var(--text-tertiary)">{d[labelKey]}</text>;
-      })}
-    </svg>
-  );
-}
+        <div id="weakBadgeWrap"></div>
+        <a href="#" class="cta-link" id="setDateCta" style="display:none;">Set your exam date →</a>
+      </div>
 
-// ---------------------------------------------------------------------------
-// Constants & helpers
-// ---------------------------------------------------------------------------
+      <div class="section-title">Subject breakdown</div>
+      <div class="card subject-progress-card" id="subjectBreakdown"></div>
 
-const STATUSES = ["Not Started", "Studying", "First Revision", "Second Revision", "Mastered"];
-const STATUS_WEIGHT = { "Not Started": 0, Studying: 0.25, "First Revision": 0.5, "Second Revision": 0.75, Mastered: 1 };
-const STATUS_COLOR = { "Not Started": "#8A8A85", Studying: "#C9A961", "First Revision": "#7695B8", "Second Revision": "#7695B8", Mastered: "#6B8F67" };
-const SUBJECT_META = {
-  physics: { label: "Physics", accent: "#C9A961" },
-  chemistry: { label: "Chemistry", accent: "#7695B8" },
-  maths: { label: "Mathematics", accent: "#B0855F" },
+      <div class="section-title">Statistics</div>
+      <div class="stat-grid" id="statGrid"></div>
+    </section>
+
+    <!-- PHYSICS -->
+    <section class="panel" id="panel-physics">
+      <div class="subject-header">
+        <div class="subject-title"><h2>Physics</h2><span class="mono" id="physicsHeadPct">0%</span></div>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="physicsSearch" placeholder="Search chapters…">
+        <div class="filter-seg" data-subject="physics">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="pending">Pending</button>
+          <button data-filter="done">Done</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="physicsAddBtn" style="margin-bottom:14px;">+ Add chapter</button>
+      <div id="physicsAddForm"></div>
+      <div class="chapter-list" id="physicsList"></div>
+    </section>
+
+    <!-- CHEMISTRY -->
+    <section class="panel" id="panel-chemistry">
+      <div class="subject-header">
+        <div class="subject-title"><h2>Chemistry</h2><span class="mono" id="chemistryHeadPct">0%</span></div>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="chemistrySearch" placeholder="Search chapters…">
+        <div class="filter-seg" data-subject="chemistry">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="pending">Pending</button>
+          <button data-filter="done">Done</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="chemistryAddBtn" style="margin-bottom:14px;">+ Add chapter</button>
+      <div id="chemistryAddForm"></div>
+      <div class="chapter-list" id="chemistryList"></div>
+    </section>
+
+    <!-- MATHS -->
+    <section class="panel" id="panel-maths">
+      <div class="subject-header">
+        <div class="subject-title"><h2>Mathematics</h2><span class="mono" id="mathsHeadPct">0%</span></div>
+      </div>
+      <div class="toolbar">
+        <input class="search-input" id="mathsSearch" placeholder="Search chapters…">
+        <div class="filter-seg" data-subject="maths">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="pending">Pending</button>
+          <button data-filter="done">Done</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="mathsAddBtn" style="margin-bottom:14px;">+ Add chapter</button>
+      <div id="mathsAddForm"></div>
+      <div class="chapter-list" id="mathsList"></div>
+    </section>
+
+    <!-- GOAL & DATA -->
+    <section class="panel" id="panel-goal">
+      <div class="section-title">Your goal</div>
+      <div class="card goal-card">
+        <div class="field">
+          <label for="examDateInput">Target exam date</label>
+          <input type="date" id="examDateInput">
+        </div>
+        <div class="field">
+          <label for="percentileInput">Target percentile (optional)</label>
+          <input type="number" id="percentileInput" min="0" max="100" step="0.01" placeholder="e.g. 99.5">
+        </div>
+        <div class="countdown-strip">
+          <div class="countdown-num mono" id="goalCountdownNum">—</div>
+          <div class="countdown-txt" id="goalCountdownTxt">Set a date to start the countdown</div>
+        </div>
+      </div>
+
+      <div class="section-title">Data</div>
+      <div class="card goal-card">
+        <div class="data-actions">
+          <button class="btn" id="exportBtn">Export as JSON</button>
+          <button class="btn" id="importBtn">Import JSON</button>
+          <input type="file" id="importFile" accept="application/json" style="display:none;">
+          <button class="btn btn-danger" id="resetBtn">Reset all data</button>
+        </div>
+        <div class="hint">All data is stored only in this browser's local storage — nothing is sent anywhere. Export regularly to back up or move your progress to another device.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>Your data stays on this device.</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================= DEFAULT SYLLABUS ============================= */
+var DEFAULT_CHAPTERS = {
+  physics: ["Units and Measurements","Motion in a Straight Line","Motion in a Plane","Laws of Motion","Work, Energy and Power","System of Particles and Rotational Motion","Gravitation","Mechanical Properties of Solids","Mechanical Properties of Fluids","Thermal Properties of Matter","Thermodynamics","Kinetic Theory of Gases","Oscillations","Waves","Electric Charges and Fields","Electrostatic Potential and Capacitance","Current Electricity","Moving Charges and Magnetism","Magnetism and Matter","Electromagnetic Induction","Alternating Current","Electromagnetic Waves","Ray Optics and Optical Instruments","Wave Optics","Dual Nature of Radiation and Matter","Atoms","Nuclei","Semiconductor Electronics","Experimental Skills"],
+  chemistry: ["Some Basic Concepts of Chemistry","Structure of Atom","Classification of Elements and Periodicity","Chemical Bonding and Molecular Structure","States of Matter","Thermodynamics","Equilibrium","Redox Reactions","Solutions","Electrochemistry","Chemical Kinetics","Hydrogen","s-Block Elements","p-Block Elements","d and f Block Elements","Coordination Compounds","General Principles of Isolation of Elements","Basic Principles of Organic Chemistry","Hydrocarbons","Haloalkanes and Haloarenes","Alcohols, Phenols and Ethers","Aldehydes, Ketones and Carboxylic Acids","Amines","Biomolecules","Polymers","Chemistry in Everyday Life","Environmental Chemistry"],
+  maths: ["Sets, Relations and Functions","Complex Numbers and Quadratic Equations","Matrices and Determinants","Permutations and Combinations","Binomial Theorem","Sequences and Series","Limits, Continuity and Differentiability","Application of Derivatives","Integral Calculus","Differential Equations","Coordinate Geometry","Three Dimensional Geometry","Vector Algebra","Statistics and Probability","Trigonometry","Mathematical Reasoning"]
 };
 
-const CARD_BG = "var(--surface)";
-const CARD_BORDER = "var(--border)";
-const SURFACE_2 = "var(--surface-2)";
-const TEXT_PRIMARY = "var(--text-primary)";
-const TEXT_SECONDARY = "var(--text-secondary)";
-const TEXT_TERTIARY = "var(--text-tertiary)";
-const ACCENT = "var(--accent)";
-const DANGER = "var(--danger)";
-const SUCCESS = "var(--success)";
-const INFO = "var(--info)";
-const ON_ACCENT = "var(--on-accent)";
-const SUCCESS_TINT = "var(--success-tint)";
-const DANGER_TINT = "var(--danger-tint)";
-const DANGER_BORDER = "var(--danger-border)";
+var TASK_KEYS = ["lecture","notes","examples","dpp","pyq","shortnotes"];
+var TASK_LABELS = {lecture:"Lecture", notes:"Notes", examples:"Solved Examples", dpp:"DPPs", pyq:"PYQs", shortnotes:"Short Notes"};
+var SUBJECT_LABELS = {physics:"Physics", chemistry:"Chemistry", maths:"Mathematics"};
+var STORAGE_KEY = "jee-tracker-data-v1";
+var THEME_KEY = "jee-tracker-theme";
 
-const todayKey = (d = new Date()) => d.toISOString().slice(0, 10);
-const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / (1000 * 60 * 60 * 24));
-const uid = () => Math.random().toString(36).slice(2, 9);
-const fmtShortDate = (iso) => { if (!iso) return ""; const d = new Date(iso); return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" }); };
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 
-const defaultChapter = (name) => ({
-  id: uid(), name, status: "Not Started",
-  lecturesCompleted: 0, lecturesTotal: 10,
-  dppDone: false, pyqsCompleted: 0, pyqsTotal: 20,
-  notesDone: false, formulaSheetDone: false, confidence: 0,
-  lastRevised: null, revisions: { r1: false, r2: false, r3: false },
-});
-
-const DEFAULT_DATA = {
-  subjects: {
-    physics: ["Units and Measurements", "Kinematics", "Laws of Motion", "Work, Energy & Power", "Rotational Motion"].map(defaultChapter),
-    chemistry: ["Mole Concept", "Atomic Structure", "Chemical Bonding", "States of Matter", "Thermodynamics"].map(defaultChapter),
-    maths: ["Sets, Relations & Functions", "Complex Numbers", "Quadratic Equations", "Sequences & Series", "Trigonometry"].map(defaultChapter),
-  },
-  dailyTasksByDate: {},
-  streakDates: [],
-  goals: { mainGoal: "JEE Main 99+ Percentile", examDate: "2027-01-24", miniGoals: [] },
-  tests: [],
-  studySessions: [],
-  progressHistory: {},
-  theme: "dark",
-};
-
-const DEFAULT_TASK_TEXTS = ["Watch lecture", "Complete DPP", "Solve PYQs", "Revise formulas"];
-
-// ---------------------------------------------------------------------------
-// Storage — plain localStorage, works on any static host including GitHub Pages
-// ---------------------------------------------------------------------------
-
-const STORAGE_KEY = "jee-dashboard-data";
-
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...DEFAULT_DATA, ...JSON.parse(raw) };
-  } catch (e) { /* corrupted or missing — fall back to defaults */ }
-  return DEFAULT_DATA;
+function emptyTasks(){
+  var t = {};
+  TASK_KEYS.forEach(function(k){ t[k] = false; });
+  return t;
 }
 
-function saveData(data) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-  catch (e) { console.error("Storage save failed:", e); }
+function makeChapter(name){
+  return { id: uid(), name: name, tasks: emptyTasks(), completedAt: {}, lastRevised: "" };
 }
 
-// ---------------------------------------------------------------------------
-// Small UI primitives
-// ---------------------------------------------------------------------------
-
-function ProgressBar({ value, accent = ACCENT, height = 6 }) {
-  return (
-    <div className="w-full rounded-full overflow-hidden" style={{ height, background: SURFACE_2 }}>
-      <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${Math.min(100, Math.max(0, value))}%`, background: accent }} />
-    </div>
-  );
-}
-
-function StatCard({ label, value, sub, mono = true }) {
-  return (
-    <div className="rounded-2xl p-4 flex flex-col gap-1 border" style={{ background: CARD_BG, borderColor: CARD_BORDER }}>
-      <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>{label}</span>
-      <span className={`text-2xl font-semibold ${mono ? "font-mono" : ""}`} style={{ color: TEXT_PRIMARY, letterSpacing: mono ? "-0.02em" : "normal" }}>{value}</span>
-      {sub && <span className="text-xs" style={{ color: TEXT_TERTIARY }}>{sub}</span>}
-    </div>
-  );
-}
-
-function StarRating({ value, onChange }) {
-  return (
-    <div className="flex gap-1">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button key={n} onClick={() => onChange(n === value ? 0 : n)} className="focus:outline-none">
-          <Icon name="star" size={16} color={n <= value ? "#C9A961" : "#555"} filled={n <= value} />
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Field({ label, children }) {
-  return <label className="flex flex-col gap-1 text-xs" style={{ color: TEXT_SECONDARY }}>{label}{children}</label>;
-}
-
-function TextInput(props) {
-  const inputStyle = { background: SURFACE_2, color: TEXT_PRIMARY, border: `1px solid ${CARD_BORDER}` };
-  return <input {...props} className={`rounded-lg px-2.5 py-2 text-sm focus:outline-none ${props.className || ""}`} style={{ ...inputStyle, ...(props.style || {}) }} />;
-}
-
-function SectionCard({ children, style }) {
-  return <div className="rounded-2xl p-4 border" style={{ background: CARD_BG, borderColor: CARD_BORDER, ...style }}>{children}</div>;
-}
-
-// ---------------------------------------------------------------------------
-// Insights engine
-// ---------------------------------------------------------------------------
-
-function computeInsights({ subjects, tests, streakDates }) {
-  const insights = [];
-  const allChapters = [];
-  Object.entries(subjects).forEach(([key, chapters]) => chapters.forEach((c) => allChapters.push({ ...c, subjectKey: key })));
-
-  let mostOverdue = null;
-  allChapters.forEach((c) => {
-    if (c.status === "Not Started" || c.status === "Mastered") return;
-    const days = c.lastRevised ? daysBetween(c.lastRevised, todayKey()) : 999;
-    if (days > 10 && (!mostOverdue || days > mostOverdue.days)) mostOverdue = { days, chapter: c };
+function seedData(){
+  var data = { subjects: {}, goal: { examDate: "", percentile: "" } };
+  Object.keys(DEFAULT_CHAPTERS).forEach(function(subj){
+    data.subjects[subj] = DEFAULT_CHAPTERS[subj].map(makeChapter);
   });
-  if (mostOverdue) insights.push(`You haven't revised ${mostOverdue.chapter.name} in ${SUBJECT_META[mostOverdue.chapter.subjectKey].label} for ${mostOverdue.days} days.`);
-
-  let lowestDpp = null;
-  Object.entries(subjects).forEach(([key, chapters]) => {
-    const started = chapters.filter((c) => c.status !== "Not Started");
-    if (!started.length) return;
-    const pct = Math.round((started.filter((c) => c.dppDone).length / started.length) * 100);
-    if (!lowestDpp || pct < lowestDpp.pct) lowestDpp = { key, pct };
-  });
-  if (lowestDpp && lowestDpp.pct < 60) insights.push(`${SUBJECT_META[lowestDpp.key].label} DPP completion is only ${lowestDpp.pct}%.`);
-
-  if (tests.length >= 2) {
-    const sorted = [...tests].sort((a, b) => new Date(a.date) - new Date(b.date));
-    const last = sorted[sorted.length - 1], prev = sorted[sorted.length - 2];
-    if (last.accuracy != null && prev.accuracy != null) {
-      const delta = last.accuracy - prev.accuracy;
-      if (Math.abs(delta) >= 1) insights.push(`Accuracy has ${delta > 0 ? "improved" : "dropped"} by ${Math.abs(Math.round(delta))}% since your last test.`);
-    }
-  }
-
-  const total = allChapters.length;
-  const score = allChapters.reduce((s, c) => s + STATUS_WEIGHT[c.status], 0);
-  const pct = total ? (score / total) * 100 : 0;
-  const nextMilestone = Math.ceil((pct + 0.01) / 25) * 25;
-  if (nextMilestone <= 100 && total > 0) {
-    const chaptersNeeded = Math.max(1, Math.ceil((nextMilestone / 100) * total - score));
-    insights.push(`Complete ${chaptersNeeded} more chapter${chaptersNeeded > 1 ? "s" : ""} to reach ${nextMilestone}% syllabus.`);
-  }
-
-  if (streakDates.length === 0) insights.push("Log today's tasks to start your streak.");
-  return insights.slice(0, 4);
+  return data;
 }
 
-// ---------------------------------------------------------------------------
-// Dashboard tab
-// ---------------------------------------------------------------------------
+/* ============================= STATE ============================= */
+var state = load();
 
-function DashboardTab({ goals, stats, insights }) {
-  const { overallPct, subjectPct, chaptersDone, chaptersTotal, streak, daysLeft, todayPct, weekPct, monthPct } = stats;
-  return (
-    <div className="flex flex-col gap-6 pb-4">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight" style={{ color: TEXT_PRIMARY }}>{overallPct}%</h1>
-        <p className="text-sm mt-1" style={{ color: TEXT_SECONDARY }}>of syllabus complete &middot; {chaptersDone}/{chaptersTotal} chapters mastered</p>
-        <div className="mt-3"><ProgressBar value={overallPct} /></div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard label="Streak" value={streak} sub={streak === 1 ? "day" : "days"} />
-        <StatCard label="Days to Exam" value={daysLeft >= 0 ? daysLeft : "—"} sub={daysLeft >= 0 ? "remaining" : "set a date"} />
-        <StatCard label="Today" value={`${todayPct}%`} sub="tasks done" />
-        <StatCard label="This Week" value={`${weekPct}%`} sub="days active" />
-      </div>
-      <div className="flex flex-col gap-3">
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Subject-wise progress</span>
-        {Object.entries(SUBJECT_META).map(([key, meta]) => (
-          <div key={key} className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-sm">
-              <span style={{ color: TEXT_PRIMARY }}>{meta.label}</span>
-              <span className="font-mono" style={{ color: TEXT_SECONDARY }}>{subjectPct[key]}%</span>
-            </div>
-            <ProgressBar value={subjectPct[key]} accent={meta.accent} />
-          </div>
-        ))}
-      </div>
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>This month</span>
-        <div className="flex items-center gap-3 mt-1">
-          <span className="text-xl font-mono font-semibold" style={{ color: TEXT_PRIMARY }}>{monthPct}%</span>
-          <span className="text-xs" style={{ color: TEXT_TERTIARY }}>days with activity logged</span>
-        </div>
-        <div className="mt-2"><ProgressBar value={monthPct} accent={INFO} /></div>
-      </SectionCard>
-      {insights.length > 0 && (
-        <SectionCard>
-          <div className="flex items-center gap-2 mb-2"><Icon name="sparkles" size={14} color="#C9A961" /><span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Insight</span></div>
-          <p className="text-sm" style={{ color: TEXT_PRIMARY }}>{insights[0]}</p>
-        </SectionCard>
-      )}
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Main goal</span>
-        <p className="text-lg mt-1" style={{ color: TEXT_PRIMARY }}>{goals.mainGoal || "Set a goal in the Goals tab"}</p>
-      </SectionCard>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Subject Tracker tab
-// ---------------------------------------------------------------------------
-
-function ChapterCard({ chapter, accent, onUpdate, onDelete }) {
-  const [open, setOpen] = useState(false);
-  const update = (patch) => onUpdate({ ...chapter, ...patch });
-  const inputStyle = { background: SURFACE_2, color: TEXT_PRIMARY, border: `1px solid ${CARD_BORDER}` };
-
-  return (
-    <div className="rounded-2xl border overflow-hidden" style={{ background: CARD_BG, borderColor: CARD_BORDER }}>
-      <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center justify-between p-4 text-left">
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate" style={{ color: TEXT_PRIMARY }}>{chapter.name}</p>
-          <div className="flex items-center gap-2 mt-1.5">
-            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: SURFACE_2, color: STATUS_COLOR[chapter.status], border: `1px solid ${STATUS_COLOR[chapter.status]}33` }}>{chapter.status}</span>
-            {chapter.confidence > 0 && <span className="text-xs flex items-center gap-0.5" style={{ color: TEXT_SECONDARY }}><Icon name="star" size={11} color="#C9A961" filled />{chapter.confidence}</span>}
-          </div>
-        </div>
-        <Icon name="chevronDown" size={18} className="transition-transform duration-300 flex-shrink-0 ml-2" style={{ color: TEXT_TERTIARY, transform: open ? "rotate(180deg)" : "rotate(0deg)" }} />
-      </button>
-      {open && (
-        <div className="px-4 pb-4 flex flex-col gap-4 border-t" style={{ borderColor: CARD_BORDER }}>
-          <div className="grid grid-cols-2 gap-3 pt-4">
-            <Field label="Status">
-              <select value={chapter.status} onChange={(e) => update({ status: e.target.value })} className="rounded-lg px-2 py-2 text-sm focus:outline-none" style={inputStyle}>
-                {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </Field>
-            <Field label="Last revised"><TextInput type="date" value={chapter.lastRevised || ""} onChange={(e) => update({ lastRevised: e.target.value || null })} className="font-mono" /></Field>
-            <Field label="Lectures">
-              <div className="flex items-center gap-1">
-                <TextInput type="number" min="0" value={chapter.lecturesCompleted} onChange={(e) => update({ lecturesCompleted: Number(e.target.value) })} className="w-full font-mono" />
-                <span style={{ color: TEXT_TERTIARY }}>/</span>
-                <TextInput type="number" min="0" value={chapter.lecturesTotal} onChange={(e) => update({ lecturesTotal: Number(e.target.value) })} className="w-full font-mono" />
-              </div>
-            </Field>
-            <Field label="PYQs solved">
-              <div className="flex items-center gap-1">
-                <TextInput type="number" min="0" value={chapter.pyqsCompleted} onChange={(e) => update({ pyqsCompleted: Number(e.target.value) })} className="w-full font-mono" />
-                <span style={{ color: TEXT_TERTIARY }}>/</span>
-                <TextInput type="number" min="0" value={chapter.pyqsTotal} onChange={(e) => update({ pyqsTotal: Number(e.target.value) })} className="w-full font-mono" />
-              </div>
-            </Field>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {[["dppDone", "DPP done"], ["notesDone", "Short notes"], ["formulaSheetDone", "Formula sheet"]].map(([key, label]) => (
-              <button key={key} onClick={() => update({ [key]: !chapter[key] })} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors" style={{ background: chapter[key] ? `${accent}1A` : SURFACE_2, borderColor: chapter[key] ? accent : CARD_BORDER, color: chapter[key] ? accent : TEXT_SECONDARY }}>
-                {chapter[key] && <Icon name="check" size={12} />}{label}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs" style={{ color: TEXT_SECONDARY }}>Confidence</span>
-            <StarRating value={chapter.confidence} onChange={(v) => update({ confidence: v })} />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs" style={{ color: TEXT_SECONDARY }}>Revisions</span>
-            <div className="flex gap-2">
-              {["r1", "r2", "r3"].map((r, i) => (
-                <button key={r} onClick={() => update({ revisions: { ...chapter.revisions, [r]: !chapter.revisions[r] } })} className="text-xs px-2.5 py-1 rounded-full border" style={{ background: chapter.revisions[r] ? SUCCESS_TINT : SURFACE_2, borderColor: chapter.revisions[r] ? SUCCESS : CARD_BORDER, color: chapter.revisions[r] ? SUCCESS : TEXT_SECONDARY }}>R{i + 1}</button>
-              ))}
-            </div>
-          </div>
-          <button onClick={() => onDelete(chapter.id)} className="flex items-center gap-1.5 text-xs self-start" style={{ color: DANGER }}><Icon name="trash" size={13} />Remove chapter</button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SubjectTrackerTab({ subjects, setSubjects }) {
-  const [activeSubject, setActiveSubject] = useState("physics");
-  const [newChapterName, setNewChapterName] = useState("");
-  const chapters = subjects[activeSubject];
-  const accent = SUBJECT_META[activeSubject].accent;
-
-  const updateChapter = (updated) => setSubjects((prev) => ({ ...prev, [activeSubject]: prev[activeSubject].map((c) => (c.id === updated.id ? updated : c)) }));
-  const deleteChapter = (id) => setSubjects((prev) => ({ ...prev, [activeSubject]: prev[activeSubject].filter((c) => c.id !== id) }));
-  const addChapter = () => {
-    const name = newChapterName.trim();
-    if (!name) return;
-    setSubjects((prev) => ({ ...prev, [activeSubject]: [...prev[activeSubject], defaultChapter(name)] }));
-    setNewChapterName("");
-  };
-
-  return (
-    <div className="flex flex-col gap-4 pb-4">
-      <div className="flex gap-2">
-        {Object.entries(SUBJECT_META).map(([key, meta]) => (
-          <button key={key} onClick={() => setActiveSubject(key)} className="flex-1 text-sm py-2.5 rounded-xl border transition-colors" style={{ background: activeSubject === key ? SURFACE_2 : "transparent", borderColor: activeSubject === key ? meta.accent : CARD_BORDER, color: activeSubject === key ? TEXT_PRIMARY : TEXT_SECONDARY }}>{meta.label}</button>
-        ))}
-      </div>
-      <div className="flex flex-col gap-2.5">
-        {chapters.map((c) => <ChapterCard key={c.id} chapter={c} accent={accent} onUpdate={updateChapter} onDelete={deleteChapter} />)}
-        {chapters.length === 0 && <p className="text-sm text-center py-6" style={{ color: TEXT_TERTIARY }}>No chapters yet — add your first one below.</p>}
-      </div>
-      <div className="flex gap-2">
-        <TextInput value={newChapterName} onChange={(e) => setNewChapterName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addChapter()} placeholder="Add a chapter…" className="flex-1" />
-        <button onClick={addChapter} className="rounded-xl px-4 flex items-center justify-center" style={{ background: ACCENT, color: ON_ACCENT }}><Icon name="plus" size={18} /></button>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Daily Planner tab
-// ---------------------------------------------------------------------------
-
-function PlannerTab({ dailyTasksByDate, setDailyTasksByDate }) {
-  const [newTask, setNewTask] = useState("");
-  const key = todayKey();
-  const tasks = dailyTasksByDate[key] || [];
-  const setTasks = (updater) => setDailyTasksByDate((prev) => ({ ...prev, [key]: typeof updater === "function" ? updater(prev[key] || []) : updater }));
-  const addTask = (text) => { const t = text.trim(); if (!t) return; setTasks((prev) => [...prev, { id: uid(), text: t, done: false }]); setNewTask(""); };
-  const toggleTask = (id) => setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
-  const removeTask = (id) => setTasks((prev) => prev.filter((t) => t.id !== id));
-  const addDefaults = () => setTasks((prev) => [...prev, ...DEFAULT_TASK_TEXTS.filter((t) => !prev.some((p) => p.text === t)).map((text) => ({ id: uid(), text, done: false }))]);
-  const pct = tasks.length ? Math.round((tasks.filter((t) => t.done).length / tasks.length) * 100) : 0;
-
-  return (
-    <div className="flex flex-col gap-5 pb-4">
-      <div>
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-medium" style={{ color: TEXT_PRIMARY }}>Today's Goals</h2>
-          <span className="text-sm font-mono" style={{ color: TEXT_SECONDARY }}>{pct}%</span>
-        </div>
-        <div className="mt-2"><ProgressBar value={pct} /></div>
-      </div>
-      <div className="flex flex-col gap-2">
-        {tasks.map((t) => (
-          <div key={t.id} className="flex items-center gap-3 rounded-xl px-3 py-3 border" style={{ background: CARD_BG, borderColor: CARD_BORDER }}>
-            <button onClick={() => toggleTask(t.id)} className="w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0" style={{ borderColor: t.done ? SUCCESS : TEXT_TERTIARY, background: t.done ? SUCCESS : "transparent" }}>
-              {t.done && <Icon name="check" size={13} color={ON_ACCENT} />}
-            </button>
-            <span className="flex-1 text-sm" style={{ color: t.done ? TEXT_TERTIARY : TEXT_PRIMARY, textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
-            <button onClick={() => removeTask(t.id)} style={{ color: TEXT_TERTIARY }}><Icon name="x" size={15} /></button>
-          </div>
-        ))}
-        {tasks.length === 0 && <p className="text-sm text-center py-6" style={{ color: TEXT_TERTIARY }}>Nothing planned yet for today.</p>}
-      </div>
-      <div className="flex gap-2">
-        <TextInput value={newTask} onChange={(e) => setNewTask(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addTask(newTask)} placeholder="Add a task…" className="flex-1" />
-        <button onClick={() => addTask(newTask)} className="rounded-xl px-4 flex items-center justify-center" style={{ background: ACCENT, color: ON_ACCENT }}><Icon name="plus" size={18} /></button>
-      </div>
-      <button onClick={addDefaults} className="text-xs self-start" style={{ color: INFO }}>+ add standard checklist (lecture, DPP, PYQs, formulas)</button>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Revision Tracker tab
-// ---------------------------------------------------------------------------
-
-function RevisionTab({ subjects }) {
-  const rows = useMemo(() => {
-    const all = [];
-    Object.entries(subjects).forEach(([subjectKey, chapters]) => {
-      chapters.forEach((c) => {
-        if (c.status === "Not Started") return;
-        const daysSince = c.lastRevised ? daysBetween(c.lastRevised, todayKey()) : null;
-        const overdue = c.status !== "Mastered" && (daysSince === null || daysSince > 14);
-        all.push({ subjectKey, chapter: c, daysSince, overdue });
+function load(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return seedData();
+    var parsed = JSON.parse(raw);
+    if(!parsed.subjects || !parsed.goal) return seedData();
+    ["physics","chemistry","maths"].forEach(function(s){
+      if(!Array.isArray(parsed.subjects[s])) parsed.subjects[s] = [];
+      parsed.subjects[s].forEach(function(ch){
+        if(!ch.tasks) ch.tasks = emptyTasks();
+        if(!ch.completedAt) ch.completedAt = {};
+        if(typeof ch.lastRevised !== "string") ch.lastRevised = "";
       });
     });
-    return all.sort((a, b) => (b.overdue ? 1 : 0) - (a.overdue ? 1 : 0));
-  }, [subjects]);
-
-  return (
-    <div className="flex flex-col gap-2.5 pb-4">
-      {rows.length === 0 && <p className="text-sm text-center py-6" style={{ color: TEXT_TERTIARY }}>Start a chapter in Subjects to see it here.</p>}
-      {rows.map(({ subjectKey, chapter, daysSince, overdue }) => (
-        <div key={chapter.id} className="rounded-xl p-3.5 border flex items-center justify-between gap-3" style={{ background: CARD_BG, borderColor: overdue ? DANGER_BORDER : CARD_BORDER }}>
-          <div className="min-w-0">
-            <p className="text-sm truncate" style={{ color: TEXT_PRIMARY }}>{chapter.name}</p>
-            <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{SUBJECT_META[subjectKey].label} · {daysSince === null ? "never revised" : `${daysSince}d ago`}</p>
-          </div>
-          <div className="flex gap-1.5 flex-shrink-0">
-            {["r1", "r2", "r3"].map((r, i) => (
-              <span key={r} className="text-xs w-6 h-6 rounded-full flex items-center justify-center" style={{ background: chapter.revisions[r] ? SUCCESS_TINT : SURFACE_2, color: chapter.revisions[r] ? SUCCESS : TEXT_TERTIARY, border: `1px solid ${chapter.revisions[r] ? SUCCESS : CARD_BORDER}` }}>{i + 1}</span>
-            ))}
-          </div>
-          {overdue && <span className="text-xs px-2 py-1 rounded-full flex-shrink-0" style={{ color: DANGER, background: DANGER_TINT }}>overdue</span>}
-        </div>
-      ))}
-    </div>
-  );
+    return parsed;
+  }catch(e){
+    return seedData();
+  }
 }
 
-// ---------------------------------------------------------------------------
-// Goals tab
-// ---------------------------------------------------------------------------
-
-function GoalsTab({ goals, setGoals }) {
-  const [newMini, setNewMini] = useState("");
-  const [newDeadline, setNewDeadline] = useState("");
-  const addMini = () => {
-    const text = newMini.trim();
-    if (!text) return;
-    setGoals((prev) => ({ ...prev, miniGoals: [...prev.miniGoals, { id: uid(), text, deadline: newDeadline || null, done: false }] }));
-    setNewMini(""); setNewDeadline("");
-  };
-  const toggleMini = (id) => setGoals((prev) => ({ ...prev, miniGoals: prev.miniGoals.map((g) => (g.id === id ? { ...g, done: !g.done } : g)) }));
-  const removeMini = (id) => setGoals((prev) => ({ ...prev, miniGoals: prev.miniGoals.filter((g) => g.id !== id) }));
-
-  return (
-    <div className="flex flex-col gap-6 pb-4">
-      <div className="flex flex-col gap-2">
-        <label className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Main goal</label>
-        <TextInput value={goals.mainGoal} onChange={(e) => setGoals((prev) => ({ ...prev, mainGoal: e.target.value }))} className="text-base py-3" />
-      </div>
-      <div className="flex flex-col gap-2">
-        <label className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Exam date</label>
-        <TextInput type="date" value={goals.examDate} onChange={(e) => setGoals((prev) => ({ ...prev, examDate: e.target.value }))} className="text-base py-3 font-mono" />
-      </div>
-      <div className="flex flex-col gap-3">
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Mini goals</span>
-        {goals.miniGoals.map((g) => (
-          <div key={g.id} className="flex items-center gap-3 rounded-xl px-3 py-3 border" style={{ background: CARD_BG, borderColor: CARD_BORDER }}>
-            <button onClick={() => toggleMini(g.id)} className="w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0" style={{ borderColor: g.done ? SUCCESS : TEXT_TERTIARY, background: g.done ? SUCCESS : "transparent" }}>
-              {g.done && <Icon name="check" size={13} color={ON_ACCENT} />}
-            </button>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm truncate" style={{ color: g.done ? TEXT_TERTIARY : TEXT_PRIMARY, textDecoration: g.done ? "line-through" : "none" }}>{g.text}</p>
-              {g.deadline && <p className="text-xs font-mono" style={{ color: TEXT_TERTIARY }}>by {g.deadline}</p>}
-            </div>
-            <button onClick={() => removeMini(g.id)} style={{ color: TEXT_TERTIARY }}><Icon name="x" size={15} /></button>
-          </div>
-        ))}
-        <div className="flex flex-col gap-2">
-          <TextInput value={newMini} onChange={(e) => setNewMini(e.target.value)} placeholder="e.g. Finish Electrostatics before Sunday" />
-          <div className="flex gap-2">
-            <TextInput type="date" value={newDeadline} onChange={(e) => setNewDeadline(e.target.value)} className="flex-1 font-mono" />
-            <button onClick={addMini} className="rounded-xl px-4 flex items-center justify-center" style={{ background: ACCENT, color: ON_ACCENT }}><Icon name="plus" size={18} /></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// ---------------------------------------------------------------------------
-// Tests tab
-// ---------------------------------------------------------------------------
-
-function AddTestForm({ onSave, onCancel }) {
-  const [form, setForm] = useState({ date: todayKey(), name: "", type: "Full", physics: "", chemistry: "", maths: "", maxMarks: "300", accuracy: "", rank: "", timeTaken: "", mistakes: "", weakTopics: "" });
-  const set = (patch) => setForm((f) => ({ ...f, ...patch }));
-  const inputStyle = { background: SURFACE_2, color: TEXT_PRIMARY, border: `1px solid ${CARD_BORDER}` };
-  const submit = () => {
-    if (!form.name.trim()) return;
-    const p = Number(form.physics) || 0, c = Number(form.chemistry) || 0, m = Number(form.maths) || 0;
-    const total = p + c + m;
-    const maxMarks = Number(form.maxMarks) || 300;
-    onSave({ id: uid(), date: form.date, name: form.name.trim(), type: form.type, physics: p, chemistry: c, maths: m, total, maxMarks, percentage: Math.round((total / maxMarks) * 100), accuracy: form.accuracy === "" ? null : Number(form.accuracy), rank: form.rank === "" ? null : Number(form.rank), timeTaken: form.timeTaken === "" ? null : Number(form.timeTaken), mistakes: form.mistakes.trim(), weakTopics: form.weakTopics.trim() });
-  };
-  return (
-    <SectionCard>
-      <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Date"><TextInput type="date" value={form.date} onChange={(e) => set({ date: e.target.value })} className="font-mono" /></Field>
-          <Field label="Type">
-            <select value={form.type} onChange={(e) => set({ type: e.target.value })} className="rounded-lg px-2 py-2 text-sm focus:outline-none" style={inputStyle}>
-              <option value="Full">Full Test</option><option value="Part">Part Test</option>
-            </select>
-          </Field>
-        </div>
-        <Field label="Test name"><TextInput value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. FIITJEE AITS 4" /></Field>
-        <div className="grid grid-cols-3 gap-2">
-          <Field label="Physics"><TextInput type="number" value={form.physics} onChange={(e) => set({ physics: e.target.value })} className="font-mono" /></Field>
-          <Field label="Chemistry"><TextInput type="number" value={form.chemistry} onChange={(e) => set({ chemistry: e.target.value })} className="font-mono" /></Field>
-          <Field label="Maths"><TextInput type="number" value={form.maths} onChange={(e) => set({ maths: e.target.value })} className="font-mono" /></Field>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Max marks"><TextInput type="number" value={form.maxMarks} onChange={(e) => set({ maxMarks: e.target.value })} className="font-mono" /></Field>
-          <Field label="Accuracy %"><TextInput type="number" value={form.accuracy} onChange={(e) => set({ accuracy: e.target.value })} className="font-mono" /></Field>
-          <Field label="Rank (optional)"><TextInput type="number" value={form.rank} onChange={(e) => set({ rank: e.target.value })} className="font-mono" /></Field>
-          <Field label="Time taken (min)"><TextInput type="number" value={form.timeTaken} onChange={(e) => set({ timeTaken: e.target.value })} className="font-mono" /></Field>
-        </div>
-        <Field label="Mistakes / notes"><TextInput value={form.mistakes} onChange={(e) => set({ mistakes: e.target.value })} placeholder="Silly calculation errors in mechanics" /></Field>
-        <Field label="Weak topics"><TextInput value={form.weakTopics} onChange={(e) => set({ weakTopics: e.target.value })} placeholder="Rotational motion, Organic reactions" /></Field>
-        <div className="flex gap-2 mt-1">
-          <button onClick={submit} className="flex-1 rounded-xl py-2.5 text-sm font-medium" style={{ background: ACCENT, color: ON_ACCENT }}>Save test</button>
-          <button onClick={onCancel} className="rounded-xl px-4 py-2.5 text-sm" style={{ background: SURFACE_2, color: TEXT_SECONDARY }}>Cancel</button>
-        </div>
-      </div>
-    </SectionCard>
-  );
+/* ============================= COMPUTATIONS ============================= */
+function chapterPct(ch){
+  var done = 0;
+  TASK_KEYS.forEach(function(k){ if(ch.tasks[k]) done++; });
+  return Math.round((done / TASK_KEYS.length) * 100);
 }
-
-function TestsTab({ tests, setTests, formOpen, setFormOpen }) {
-  const sorted = useMemo(() => [...tests].sort((a, b) => new Date(a.date) - new Date(b.date)), [tests]);
-  const chartData = sorted.map((t) => ({ label: fmtShortDate(t.date), marks: t.total, accuracy: t.accuracy ?? 0 }));
-  const subjectAvg = useMemo(() => {
-    if (!tests.length) return [];
-    const avg = (k) => Math.round(tests.reduce((s, t) => s + t[k], 0) / tests.length);
-    return [{ name: "Physics", value: avg("physics") }, { name: "Chemistry", value: avg("chemistry") }, { name: "Maths", value: avg("maths") }];
-  }, [tests]);
-  const removeTest = (id) => setTests((prev) => prev.filter((t) => t.id !== id));
-
-  return (
-    <div className="flex flex-col gap-5 pb-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium" style={{ color: TEXT_PRIMARY }}>Test History</h2>
-        {!formOpen && <button onClick={() => setFormOpen(true)} className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full" style={{ background: ACCENT, color: ON_ACCENT }}><Icon name="plus" size={13} />Add test</button>}
-      </div>
-      {formOpen && <AddTestForm onSave={(t) => { setTests((prev) => [...prev, t]); setFormOpen(false); }} onCancel={() => setFormOpen(false)} />}
-      {tests.length > 1 && (
-        <>
-          <SectionCard>
-            <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Marks improvement</span>
-            <div className="mt-2"><MiniLineChart data={chartData} valueKey="marks" labelKey="label" color="#C9A961" maxVal={Math.max(...chartData.map(d => d.marks), 100)} /></div>
-          </SectionCard>
-          <SectionCard>
-            <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Accuracy trend</span>
-            <div className="mt-2"><MiniLineChart data={chartData} valueKey="accuracy" labelKey="label" color="#7695B8" maxVal={100} /></div>
-          </SectionCard>
-          <SectionCard>
-            <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Subject-wise average</span>
-            <div className="mt-2"><MiniBarChart data={subjectAvg} valueKey="value" labelKey="name" color="#B0855F" /></div>
-          </SectionCard>
-        </>
-      )}
-      <div className="flex flex-col gap-2.5">
-        {[...tests].sort((a, b) => new Date(b.date) - new Date(a.date)).map((t) => (
-          <div key={t.id} className="rounded-xl p-3.5 border" style={{ background: CARD_BG, borderColor: CARD_BORDER }}>
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="text-sm font-medium" style={{ color: TEXT_PRIMARY }}>{t.name}</p>
-                <p className="text-xs mt-0.5 font-mono" style={{ color: TEXT_TERTIARY }}>{fmtShortDate(t.date)} · {t.type}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-mono font-semibold" style={{ color: TEXT_PRIMARY }}>{t.percentage}%</span>
-                <button onClick={() => removeTest(t.id)} style={{ color: TEXT_TERTIARY }}><Icon name="trash" size={14} /></button>
-              </div>
-            </div>
-            <div className="flex gap-4 mt-2 text-xs font-mono" style={{ color: TEXT_SECONDARY }}>
-              <span>P {t.physics}</span><span>C {t.chemistry}</span><span>M {t.maths}</span>
-              {t.accuracy != null && <span>Acc {t.accuracy}%</span>}
-              {t.rank != null && <span>Rank {t.rank}</span>}
-            </div>
-            {t.weakTopics && <p className="text-xs mt-2" style={{ color: TEXT_TERTIARY }}>Weak: {t.weakTopics}</p>}
-          </div>
-        ))}
-        {tests.length === 0 && !formOpen && <p className="text-sm text-center py-6" style={{ color: TEXT_TERTIARY }}>No tests logged yet.</p>}
-      </div>
-    </div>
-  );
+function isChapterComplete(ch){
+  return TASK_KEYS.every(function(k){ return ch.tasks[k]; });
 }
-
-// ---------------------------------------------------------------------------
-// Practice tab (DPP & PYQ)
-// ---------------------------------------------------------------------------
-
-function PracticeTab({ subjects, setSubjects }) {
-  const [activeSubject, setActiveSubject] = useState("physics");
-  const chapters = subjects[activeSubject].filter((c) => c.status !== "Not Started");
-  const toggleDpp = (id) => setSubjects((prev) => ({ ...prev, [activeSubject]: prev[activeSubject].map((c) => (c.id === id ? { ...c, dppDone: !c.dppDone } : c)) }));
-  const bumpPyq = (id, delta) => setSubjects((prev) => ({ ...prev, [activeSubject]: prev[activeSubject].map((c) => (c.id === id ? { ...c, pyqsCompleted: Math.max(0, Math.min(c.pyqsTotal, c.pyqsCompleted + delta)) } : c)) }));
-  const dppDone = chapters.filter((c) => c.dppDone).length;
-  const pyqSolved = chapters.reduce((s, c) => s + c.pyqsCompleted, 0);
-  const pyqTotal = chapters.reduce((s, c) => s + c.pyqsTotal, 0);
-
-  return (
-    <div className="flex flex-col gap-4 pb-4">
-      <div className="flex gap-2">
-        {Object.entries(SUBJECT_META).map(([key, meta]) => (
-          <button key={key} onClick={() => setActiveSubject(key)} className="flex-1 text-sm py-2.5 rounded-xl border transition-colors" style={{ background: activeSubject === key ? SURFACE_2 : "transparent", borderColor: activeSubject === key ? meta.accent : CARD_BORDER, color: activeSubject === key ? TEXT_PRIMARY : TEXT_SECONDARY }}>{meta.label}</button>
-        ))}
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard label="DPP done" value={`${dppDone}/${chapters.length}`} mono />
-        <StatCard label="PYQs solved" value={`${pyqSolved}/${pyqTotal}`} mono />
-      </div>
-      <div className="flex flex-col gap-2.5">
-        {chapters.map((c) => (
-          <div key={c.id} className="rounded-xl p-3.5 border flex flex-col gap-2.5" style={{ background: CARD_BG, borderColor: CARD_BORDER }}>
-            <p className="text-sm" style={{ color: TEXT_PRIMARY }}>{c.name}</p>
-            <div className="flex items-center justify-between">
-              <button onClick={() => toggleDpp(c.id)} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border" style={{ background: c.dppDone ? SUCCESS_TINT : SURFACE_2, borderColor: c.dppDone ? SUCCESS : CARD_BORDER, color: c.dppDone ? SUCCESS : TEXT_SECONDARY }}>{c.dppDone && <Icon name="check" size={12} />}DPP {c.dppDone ? "done" : "pending"}</button>
-              <div className="flex items-center gap-2">
-                <button onClick={() => bumpPyq(c.id, -1)} className="w-6 h-6 rounded-full flex items-center justify-center text-sm" style={{ background: SURFACE_2, color: TEXT_SECONDARY }}>−</button>
-                <span className="text-xs font-mono w-14 text-center" style={{ color: TEXT_PRIMARY }}>{c.pyqsCompleted}/{c.pyqsTotal}</span>
-                <button onClick={() => bumpPyq(c.id, 1)} className="w-6 h-6 rounded-full flex items-center justify-center text-sm" style={{ background: SURFACE_2, color: TEXT_SECONDARY }}>+</button>
-              </div>
-            </div>
-            <ProgressBar value={c.pyqsTotal ? (c.pyqsCompleted / c.pyqsTotal) * 100 : 0} accent={SUBJECT_META[activeSubject].accent} height={4} />
-          </div>
-        ))}
-        {chapters.length === 0 && <p className="text-sm text-center py-6" style={{ color: TEXT_TERTIARY }}>Start a chapter in Subjects to track its practice here.</p>}
-      </div>
-    </div>
-  );
+function subjectPct(subj){
+  var list = state.subjects[subj];
+  if(!list.length) return 0;
+  var total = 0;
+  list.forEach(function(ch){ total += chapterPct(ch); });
+  return Math.round(total / list.length);
 }
-
-// ---------------------------------------------------------------------------
-// Analytics tab
-// ---------------------------------------------------------------------------
-
-function AddHoursForm({ onSave, onCancel }) {
-  const [form, setForm] = useState({ date: todayKey(), subject: "physics", hours: "" });
-  const inputStyle = { background: SURFACE_2, color: TEXT_PRIMARY, border: `1px solid ${CARD_BORDER}` };
-  const submit = () => { const hours = Number(form.hours); if (!hours || hours <= 0) return; onSave({ id: uid(), date: form.date, subject: form.subject, hours }); };
-  return (
-    <SectionCard>
-      <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Date"><TextInput type="date" value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} className="font-mono" /></Field>
-          <Field label="Subject">
-            <select value={form.subject} onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))} className="rounded-lg px-2 py-2 text-sm focus:outline-none" style={inputStyle}>
-              <option value="physics">Physics</option><option value="chemistry">Chemistry</option><option value="maths">Maths</option><option value="other">Other</option>
-            </select>
-          </Field>
-        </div>
-        <Field label="Hours studied"><TextInput type="number" step="0.5" value={form.hours} onChange={(e) => setForm((f) => ({ ...f, hours: e.target.value }))} className="font-mono" /></Field>
-        <div className="flex gap-2 mt-1">
-          <button onClick={submit} className="flex-1 rounded-xl py-2.5 text-sm font-medium" style={{ background: ACCENT, color: ON_ACCENT }}>Log hours</button>
-          <button onClick={onCancel} className="rounded-xl px-4 py-2.5 text-sm" style={{ background: SURFACE_2, color: TEXT_SECONDARY }}>Cancel</button>
-        </div>
-      </div>
-    </SectionCard>
-  );
-}
-
-function AnalyticsTab({ studySessions, setStudySessions, progressHistory, insights, formOpen, setFormOpen }) {
-  const weekData = useMemo(() => {
-    const days = [];
-    const d = new Date();
-    for (let i = 6; i >= 0; i--) {
-      const dd = new Date(d); dd.setDate(d.getDate() - i);
-      const key = todayKey(dd);
-      const hours = studySessions.filter((s) => s.date === key).reduce((sum, s) => sum + s.hours, 0);
-      days.push({ label: dd.toLocaleDateString("en-IN", { weekday: "short" }), hours: Math.round(hours * 10) / 10 });
-    }
-    return days;
-  }, [studySessions]);
-
-  const weekTotals = useMemo(() => {
-    const weeks = [];
-    const d = new Date();
-    for (let w = 5; w >= 0; w--) {
-      let total = 0;
-      for (let i = 0; i < 7; i++) {
-        const dd = new Date(d); dd.setDate(d.getDate() - (w * 7 + i));
-        const key = todayKey(dd);
-        total += studySessions.filter((s) => s.date === key).reduce((sum, s) => sum + s.hours, 0);
-      }
-      weeks.push({ label: `W-${w}`, hours: Math.round(total * 10) / 10 });
-    }
-    return weeks;
-  }, [studySessions]);
-
-  const subjectHours = useMemo(() => {
-    const totals = { physics: 0, chemistry: 0, maths: 0, other: 0 };
-    studySessions.forEach((s) => { totals[s.subject] = (totals[s.subject] || 0) + s.hours; });
-    const max = Math.max(1, ...Object.values(totals));
-    return Object.entries(totals).map(([key, val]) => ({ key, val, pct: Math.round((val / max) * 100) }));
-  }, [studySessions]);
-
-  const completionTrend = useMemo(() => Object.entries(progressHistory).sort((a, b) => new Date(a[0]) - new Date(b[0])).slice(-30).map(([date, pct]) => ({ label: fmtShortDate(date), pct })), [progressHistory]);
-
-  return (
-    <div className="flex flex-col gap-5 pb-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium" style={{ color: TEXT_PRIMARY }}>Study Analytics</h2>
-        {!formOpen && <button onClick={() => setFormOpen(true)} className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full" style={{ background: ACCENT, color: ON_ACCENT }}><Icon name="plus" size={13} />Log hours</button>}
-      </div>
-      {formOpen && <AddHoursForm onSave={(s) => { setStudySessions((prev) => [...prev, s]); setFormOpen(false); }} onCancel={() => setFormOpen(false)} />}
-      {insights.length > 0 && (
-        <SectionCard>
-          <div className="flex items-center gap-2 mb-2"><Icon name="sparkles" size={14} color="#C9A961" /><span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Smart insights</span></div>
-          <ul className="flex flex-col gap-2">{insights.map((ins, i) => <li key={i} className="text-sm" style={{ color: TEXT_PRIMARY }}>· {ins}</li>)}</ul>
-        </SectionCard>
-      )}
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Weekly consistency</span>
-        <div className="mt-2"><MiniBarChart data={weekData} valueKey="hours" labelKey="label" color="#C9A961" /></div>
-      </SectionCard>
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Monthly consistency</span>
-        <div className="mt-2"><MiniBarChart data={weekTotals} valueKey="hours" labelKey="label" color="#7695B8" /></div>
-      </SectionCard>
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Subject-wise time</span>
-        <div className="flex flex-col gap-3 mt-3">
-          {subjectHours.filter((s) => s.key !== "other" || s.val > 0).map((s) => (
-            <div key={s.key} className="flex flex-col gap-1.5">
-              <div className="flex justify-between text-sm">
-                <span style={{ color: TEXT_PRIMARY }}>{s.key === "other" ? "Other" : SUBJECT_META[s.key].label}</span>
-                <span className="font-mono" style={{ color: TEXT_SECONDARY }}>{Math.round(s.val * 10) / 10}h</span>
-              </div>
-              <ProgressBar value={s.pct} accent={s.key === "other" ? "#8A8A85" : SUBJECT_META[s.key].accent} />
-            </div>
-          ))}
-        </div>
-      </SectionCard>
-      {completionTrend.length > 1 && (
-        <SectionCard>
-          <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Completion trend</span>
-          <div className="mt-2"><MiniLineChart data={completionTrend} valueKey="pct" labelKey="label" color="#6B8F67" maxVal={100} /></div>
-        </SectionCard>
-      )}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Calendar tab
-// ---------------------------------------------------------------------------
-
-function CalendarTab({ streakDates, tests, studySessions }) {
-  const activityByDate = useMemo(() => {
-    const map = {};
-    streakDates.forEach((d) => { map[d] = (map[d] || 0) + 1; });
-    tests.forEach((t) => { map[t.date] = (map[t.date] || 0) + 1; });
-    studySessions.forEach((s) => { if (s.hours > 0) map[s.date] = (map[s.date] || 0) + 1; });
-    return map;
-  }, [streakDates, tests, studySessions]);
-
-  const weeks = useMemo(() => {
-    const totalDays = 98;
-    const end = new Date();
-    const start = new Date();
-    start.setDate(end.getDate() - totalDays + 1);
-    start.setDate(start.getDate() - start.getDay());
-    const grid = [];
-    let cursor = new Date(start);
-    while (cursor <= end) {
-      const week = [];
-      for (let i = 0; i < 7; i++) {
-        const key = todayKey(cursor);
-        week.push({ key, level: activityByDate[key] || 0, inRange: cursor <= end });
-        cursor.setDate(cursor.getDate() + 1);
-      }
-      grid.push(week);
-    }
-    return grid;
-  }, [activityByDate]);
-
-  const levelColor = (level) => level === 0 ? "var(--heat-0)" : level === 1 ? "var(--heat-1)" : level === 2 ? "var(--heat-2)" : "var(--heat-3)";
-
-  return (
-    <div className="flex flex-col gap-5 pb-4">
-      <h2 className="text-lg font-medium" style={{ color: TEXT_PRIMARY }}>Activity Calendar</h2>
-      <SectionCard>
-        <div className="flex gap-1 overflow-x-auto pb-1">
-          {weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-1">
-              {week.map((day, di) => <div key={di} title={day.key} className="w-3 h-3 rounded-sm" style={{ background: day.inRange ? levelColor(day.level) : "transparent" }} />)}
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 mt-4 text-xs" style={{ color: TEXT_TERTIARY }}>
-          <span>Less</span>
-          <div className="w-3 h-3 rounded-sm" style={{ background: "var(--heat-0)" }} />
-          <div className="w-3 h-3 rounded-sm" style={{ background: "var(--heat-1)" }} />
-          <div className="w-3 h-3 rounded-sm" style={{ background: "var(--heat-2)" }} />
-          <div className="w-3 h-3 rounded-sm" style={{ background: "var(--heat-3)" }} />
-          <span>More</span>
-        </div>
-      </SectionCard>
-      <p className="text-xs text-center" style={{ color: TEXT_TERTIARY }}>Study days, test days, and revision activity — all in one view.</p>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Settings tab (theme + backup)
-// ---------------------------------------------------------------------------
-
-function SettingsTab({ theme, setTheme, onExport, onFileSelect, importPreview, importError, onConfirmImport, onCancelImport }) {
-  const fileRef = useRef(null);
-  return (
-    <div className="flex flex-col gap-5 pb-4">
-      <h2 className="text-lg font-medium" style={{ color: TEXT_PRIMARY }}>Settings</h2>
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Appearance</span>
-        <div className="flex gap-2 mt-3">
-          <button onClick={() => setTheme("dark")} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm" style={{ background: theme === "dark" ? SURFACE_2 : "transparent", borderColor: theme === "dark" ? ACCENT : CARD_BORDER, color: theme === "dark" ? TEXT_PRIMARY : TEXT_SECONDARY }}><Icon name="moon" size={15} />Dark</button>
-          <button onClick={() => setTheme("light")} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm" style={{ background: theme === "light" ? SURFACE_2 : "transparent", borderColor: theme === "light" ? ACCENT : CARD_BORDER, color: theme === "light" ? TEXT_PRIMARY : TEXT_SECONDARY }}><Icon name="sun" size={15} />Light</button>
-        </div>
-      </SectionCard>
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Backup</span>
-        <p className="text-xs mt-2 mb-3" style={{ color: TEXT_TERTIARY }}>Download everything — subjects, tests, planner, goals — as a single JSON file.</p>
-        <button onClick={onExport} className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium" style={{ background: ACCENT, color: ON_ACCENT }}><Icon name="download" size={15} />Download backup</button>
-      </SectionCard>
-      <SectionCard>
-        <span className="text-xs uppercase tracking-widest" style={{ color: TEXT_SECONDARY }}>Restore</span>
-        <p className="text-xs mt-2 mb-3" style={{ color: TEXT_TERTIARY }}>Importing a backup replaces all current data on this device.</p>
-        <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={(e) => { if (e.target.files[0]) onFileSelect(e.target.files[0]); e.target.value = ""; }} />
-        <button onClick={() => fileRef.current && fileRef.current.click()} className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm" style={{ background: SURFACE_2, color: TEXT_PRIMARY, border: `1px solid ${CARD_BORDER}` }}><Icon name="upload" size={15} />Choose backup file</button>
-        {importError && <p className="text-xs mt-2" style={{ color: DANGER }}>{importError}</p>}
-        {importPreview && (
-          <div className="mt-3 rounded-xl p-3 border" style={{ borderColor: DANGER_BORDER, background: DANGER_TINT }}>
-            <p className="text-xs" style={{ color: TEXT_PRIMARY }}>Replace all current data with this backup? This can't be undone.</p>
-            <div className="flex gap-2 mt-2">
-              <button onClick={onConfirmImport} className="flex-1 rounded-lg py-2 text-xs font-medium" style={{ background: DANGER, color: "#FFFFFF" }}>Replace data</button>
-              <button onClick={onCancelImport} className="rounded-lg px-3 py-2 text-xs" style={{ background: SURFACE_2, color: TEXT_SECONDARY }}>Cancel</button>
-            </div>
-          </div>
-        )}
-      </SectionCard>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// More menu (secondary nav)
-// ---------------------------------------------------------------------------
-
-const MORE_ITEMS = [
-  { key: "tests", label: "Test Tracker", desc: "Log results & see trends", icon: "clipboardList" },
-  { key: "practice", label: "DPP & PYQ Practice", desc: "Chapter-wise completion", icon: "penSquare" },
-  { key: "analytics", label: "Study Analytics", desc: "Hours, consistency, trends", icon: "barChart3" },
-  { key: "calendar", label: "Activity Calendar", desc: "Your consistency map", icon: "grid" },
-  { key: "goals", label: "Goals", desc: "Main goal & mini goals", icon: "target" },
-  { key: "settings", label: "Settings", desc: "Theme, backup & restore", icon: "settings" },
-];
-
-function MoreTab({ onNavigate }) {
-  return (
-    <div className="flex flex-col gap-2.5 pb-4">
-      {MORE_ITEMS.map(({ key, label, desc, icon }) => (
-        <button key={key} onClick={() => onNavigate(key)} className="flex items-center gap-3 rounded-xl p-4 border text-left" style={{ background: CARD_BG, borderColor: CARD_BORDER }}>
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: SURFACE_2 }}><Icon name={icon} size={16} color="#C9A961" /></div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium" style={{ color: TEXT_PRIMARY }}>{label}</p>
-            <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{desc}</p>
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Quick Add FAB
-// ---------------------------------------------------------------------------
-
-function QuickAddFab({ onAction }) {
-  const [open, setOpen] = useState(false);
-  const actions = [
-    { key: "test", label: "Add Test", icon: "clipboardList" },
-    { key: "chapter", label: "Add Chapter Progress", icon: "bookOpen" },
-    { key: "hours", label: "Add Study Hours", icon: "timer" },
-    { key: "revision", label: "Add Revision", icon: "rotateCcw" },
-  ];
-  return (
-    <div className="fixed right-5 z-20" style={{ bottom: "88px" }}>
-      {open && (
-        <div className="flex flex-col gap-2 mb-3 items-end">
-          {actions.map(({ key, label, icon }) => (
-            <button key={key} onClick={() => { setOpen(false); onAction(key); }} className="flex items-center gap-2 pl-3 pr-4 py-2 rounded-full border text-xs shadow-lg" style={{ background: SURFACE_2, borderColor: CARD_BORDER, color: TEXT_PRIMARY }}><Icon name={icon} size={14} color="#C9A961" />{label}</button>
-          ))}
-        </div>
-      )}
-      <button onClick={() => setOpen((o) => !o)} className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg" style={{ background: ACCENT, color: ON_ACCENT, transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease" }}><Icon name="plus" size={24} /></button>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Root App
-// ---------------------------------------------------------------------------
-
-const PRIMARY_TABS = [
-  { key: "dashboard", label: "Home", icon: "layoutDashboard" },
-  { key: "subjects", label: "Subjects", icon: "bookOpen" },
-  { key: "planner", label: "Planner", icon: "listChecks" },
-  { key: "revision", label: "Revision", icon: "rotateCcw" },
-  { key: "more", label: "More", icon: "moreHorizontal" },
-];
-
-const SECONDARY_TAB_KEYS = ["tests", "practice", "analytics", "calendar", "goals", "settings"];
-const SECONDARY_TAB_LABELS = { tests: "Test Tracker", practice: "DPP & PYQ", analytics: "Analytics", calendar: "Calendar", goals: "Goals", settings: "Settings" };
-
-function App() {
-  const initial = loadData();
-  const [tab, setTab] = useState("dashboard");
-  const [subjects, setSubjects] = useState(initial.subjects);
-  const [dailyTasksByDate, setDailyTasksByDate] = useState(initial.dailyTasksByDate);
-  const [streakDates, setStreakDates] = useState(initial.streakDates);
-  const [goals, setGoals] = useState(initial.goals);
-  const [tests, setTests] = useState(initial.tests);
-  const [studySessions, setStudySessions] = useState(initial.studySessions);
-  const [progressHistory, setProgressHistory] = useState(initial.progressHistory);
-  const [theme, setTheme] = useState(initial.theme || "dark");
-  const [testFormOpen, setTestFormOpen] = useState(false);
-  const [hoursFormOpen, setHoursFormOpen] = useState(false);
-  const [importPreview, setImportPreview] = useState(null);
-  const [importError, setImportError] = useState("");
-
-  const saveTimer = useRef(null);
-  const hydrated = useRef(true); // localStorage read is synchronous, so we're hydrated immediately
-
-  useEffect(() => {
-    const key = todayKey();
-    const tasks = dailyTasksByDate[key] || [];
-    if (tasks.some((t) => t.done)) setStreakDates((prev) => (prev.includes(key) ? prev : [...prev, key]));
-  }, [dailyTasksByDate]);
-
-  useEffect(() => {
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => saveData({ subjects, dailyTasksByDate, streakDates, goals, tests, studySessions, progressHistory, theme }), 500);
-    return () => clearTimeout(saveTimer.current);
-  }, [subjects, dailyTasksByDate, streakDates, goals, tests, studySessions, progressHistory, theme]);
-
-  const stats = useMemo(() => {
-    const allChapters = Object.values(subjects).flat();
-    const chaptersTotal = allChapters.length;
-    const chaptersDone = allChapters.filter((c) => c.status === "Mastered").length;
-    const overallScore = allChapters.reduce((sum, c) => sum + STATUS_WEIGHT[c.status], 0);
-    const overallPct = chaptersTotal ? Math.round((overallScore / chaptersTotal) * 100) : 0;
-    const subjectPct = {};
-    Object.entries(subjects).forEach(([key, chapters]) => {
-      const score = chapters.reduce((sum, c) => sum + STATUS_WEIGHT[c.status], 0);
-      subjectPct[key] = chapters.length ? Math.round((score / chapters.length) * 100) : 0;
+function overallStats(){
+  var subjects = ["physics","chemistry","maths"];
+  var totalChapters = 0, completedChapters = 0, totalTaskPct = 0, chapterCount = 0;
+  subjects.forEach(function(s){
+    state.subjects[s].forEach(function(ch){
+      totalChapters++;
+      chapterCount++;
+      totalTaskPct += chapterPct(ch);
+      if(isChapterComplete(ch)) completedChapters++;
     });
-    const dateSet = new Set(streakDates);
-    let streak = 0;
-    let cursor = new Date();
-    if (!dateSet.has(todayKey(cursor))) cursor.setDate(cursor.getDate() - 1);
-    while (dateSet.has(todayKey(cursor))) { streak += 1; cursor.setDate(cursor.getDate() - 1); }
-    const daysLeft = goals.examDate ? daysBetween(todayKey(), goals.examDate) : -1;
-    const todayTasks = dailyTasksByDate[todayKey()] || [];
-    const todayPct = todayTasks.length ? Math.round((todayTasks.filter((t) => t.done).length / todayTasks.length) * 100) : 0;
-    const pctActiveInLastNDays = (n) => {
-      let active = 0;
-      const d = new Date();
-      for (let i = 0; i < n; i++) { if (dateSet.has(todayKey(d))) active += 1; d.setDate(d.getDate() - 1); }
-      return Math.round((active / n) * 100);
-    };
-    return { overallPct, subjectPct, chaptersDone, chaptersTotal, streak, daysLeft, todayPct, weekPct: pctActiveInLastNDays(7), monthPct: pctActiveInLastNDays(30) };
-  }, [subjects, streakDates, dailyTasksByDate, goals]);
-
-  useEffect(() => {
-    const key = todayKey();
-    setProgressHistory((prev) => (prev[key] === stats.overallPct ? prev : { ...prev, [key]: stats.overallPct }));
-  }, [stats.overallPct]);
-
-  const insights = useMemo(() => computeInsights({ subjects, tests, streakDates }), [subjects, tests, streakDates]);
-  const isSecondary = SECONDARY_TAB_KEYS.includes(tab);
-  const activePrimaryKey = isSecondary ? "more" : tab;
-
-  const handleFabAction = (key) => {
-    if (key === "test") { setTab("tests"); setTestFormOpen(true); }
-    else if (key === "hours") { setTab("analytics"); setHoursFormOpen(true); }
-    else if (key === "chapter") { setTab("subjects"); }
-    else if (key === "revision") { setTab("revision"); }
+  });
+  var overallPct = chapterCount ? Math.round(totalTaskPct / chapterCount) : 0;
+  return {
+    overallPct: overallPct,
+    totalChapters: totalChapters,
+    completedChapters: completedChapters,
+    remainingChapters: totalChapters - completedChapters
   };
-
-  const handleExport = () => {
-    const payload = { subjects, dailyTasksByDate, streakDates, goals, tests, studySessions, progressHistory, theme, exportedAt: new Date().toISOString() };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `jee-dashboard-backup-${todayKey()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleFileSelect = (file) => {
-    setImportError("");
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const parsed = JSON.parse(e.target.result);
-        if (!parsed || typeof parsed !== "object" || !parsed.subjects) throw new Error("shape");
-        setImportPreview(parsed);
-      } catch (err) { setImportError("This doesn't look like a valid backup file."); }
-    };
-    reader.onerror = () => setImportError("Couldn't read that file.");
-    reader.readAsText(file);
-  };
-
-  const confirmImport = () => {
-    if (!importPreview) return;
-    setSubjects(importPreview.subjects || DEFAULT_DATA.subjects);
-    setDailyTasksByDate(importPreview.dailyTasksByDate || {});
-    setStreakDates(importPreview.streakDates || []);
-    setGoals(importPreview.goals || DEFAULT_DATA.goals);
-    setTests(importPreview.tests || []);
-    setStudySessions(importPreview.studySessions || []);
-    setProgressHistory(importPreview.progressHistory || {});
-    if (importPreview.theme) setTheme(importPreview.theme);
-    setImportPreview(null);
-  };
-
-  return (
-    <div className="w-full min-h-screen flex flex-col relative" style={{ background: "var(--bg)" }}>
-      <style>{`
-        :root {
-          --bg: ${theme === "dark" ? "#0A0A0A" : "#FAFAF8"};
-          --surface: ${theme === "dark" ? "#141414" : "#FFFFFF"};
-          --surface-2: ${theme === "dark" ? "#1C1C1C" : "#F0EFEA"};
-          --border: ${theme === "dark" ? "#262626" : "#E4E2DB"};
-          --text-primary: ${theme === "dark" ? "#F5F5F3" : "#181816"};
-          --text-secondary: ${theme === "dark" ? "#8F8F8C" : "#6B6B66"};
-          --text-tertiary: ${theme === "dark" ? "#5C5C59" : "#9B9B93"};
-          --accent: ${theme === "dark" ? "#C9A961" : "#B08A3F"};
-          --danger: ${theme === "dark" ? "#C9524A" : "#B23B33"};
-          --success: ${theme === "dark" ? "#7A9B76" : "#4F7A4B"};
-          --info: ${theme === "dark" ? "#8FA9C9" : "#4A6E93"};
-          --on-accent: #0A0A0A;
-          --overlay-bg: ${theme === "dark" ? "rgba(10,10,10,0.92)" : "rgba(250,250,248,0.92)"};
-          --success-tint: ${theme === "dark" ? "#7A9B761A" : "#4F7A4B1A"};
-          --danger-tint: ${theme === "dark" ? "#C9524A1A" : "#B23B331A"};
-          --danger-border: ${theme === "dark" ? "#C9524A55" : "#B23B3355"};
-          --heat-0: ${theme === "dark" ? "#1C1C1C" : "#F0EFEA"};
-          --heat-1: ${theme === "dark" ? "#C9A96155" : "#B08A3F44"};
-          --heat-2: ${theme === "dark" ? "#C9A961AA" : "#B08A3F99"};
-          --heat-3: ${theme === "dark" ? "#C9A961" : "#B08A3F"};
-        }
-        body { background: var(--bg); }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(${theme === "dark" ? "0.6" : "0.35"}); }
-      `}</style>
-
-      <header className="px-5 pt-6 pb-4 flex items-center justify-between sticky top-0 z-10" style={{ background: "var(--overlay-bg)", backdropFilter: "blur(8px)" }}>
-        {isSecondary ? (
-          <button onClick={() => setTab("more")} className="flex items-center gap-1.5 text-sm" style={{ color: TEXT_PRIMARY }}><Icon name="chevronLeft" size={18} />{SECONDARY_TAB_LABELS[tab]}</button>
-        ) : (
-          <div className="flex items-center gap-2"><Icon name="flame" size={16} color="#C9A961" /><span className="text-xs font-mono" style={{ color: TEXT_SECONDARY }}>{stats.streak} day{stats.streak === 1 ? "" : "s"}</span></div>
-        )}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2"><Icon name="clock" size={16} color="#7695B8" /><span className="text-xs font-mono" style={{ color: TEXT_SECONDARY }}>{stats.daysLeft >= 0 ? `${stats.daysLeft}d left` : "—"}</span></div>
-          <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} style={{ color: TEXT_SECONDARY }} aria-label="Toggle theme"><Icon name={theme === "dark" ? "sun" : "moon"} size={16} /></button>
-        </div>
-      </header>
-
-      <main className="flex-1 px-5 max-w-lg w-full mx-auto">
-        {tab === "dashboard" && <DashboardTab goals={goals} stats={stats} insights={insights} />}
-        {tab === "subjects" && <SubjectTrackerTab subjects={subjects} setSubjects={setSubjects} />}
-        {tab === "planner" && <PlannerTab dailyTasksByDate={dailyTasksByDate} setDailyTasksByDate={setDailyTasksByDate} />}
-        {tab === "revision" && <RevisionTab subjects={subjects} />}
-        {tab === "more" && <MoreTab onNavigate={setTab} />}
-        {tab === "tests" && <TestsTab tests={tests} setTests={setTests} formOpen={testFormOpen} setFormOpen={setTestFormOpen} />}
-        {tab === "practice" && <PracticeTab subjects={subjects} setSubjects={setSubjects} />}
-        {tab === "analytics" && <AnalyticsTab studySessions={studySessions} setStudySessions={setStudySessions} progressHistory={progressHistory} insights={insights} formOpen={hoursFormOpen} setFormOpen={setHoursFormOpen} />}
-        {tab === "calendar" && <CalendarTab streakDates={streakDates} tests={tests} studySessions={studySessions} />}
-        {tab === "goals" && <GoalsTab goals={goals} setGoals={setGoals} />}
-        {tab === "settings" && <SettingsTab theme={theme} setTheme={setTheme} onExport={handleExport} onFileSelect={handleFileSelect} importPreview={importPreview} importError={importError} onConfirmImport={confirmImport} onCancelImport={() => { setImportPreview(null); setImportError(""); }} />}
-      </main>
-
-      <QuickAddFab onAction={handleFabAction} />
-
-      <nav className="sticky bottom-0 flex justify-around items-center py-2.5 border-t max-w-lg w-full mx-auto z-10" style={{ background: "var(--overlay-bg)", borderColor: "var(--border)", backdropFilter: "blur(8px)" }}>
-        {PRIMARY_TABS.map(({ key, label, icon }) => (
-          <button key={key} onClick={() => setTab(key)} className="flex flex-col items-center gap-1 px-3 py-1.5">
-            <Icon name={icon} size={19} color={activePrimaryKey === key ? "#C9A961" : "var(--text-tertiary)"} />
-            <span className="text-xs" style={{ color: activePrimaryKey === key ? TEXT_PRIMARY : TEXT_TERTIARY }}>{label}</span>
-          </button>
-        ))}
-      </nav>
-    </div>
-  );
+}
+function todayTaskCount(){
+  var todayStr = new Date().toDateString();
+  var count = 0;
+  ["physics","chemistry","maths"].forEach(function(s){
+    state.subjects[s].forEach(function(ch){
+      TASK_KEYS.forEach(function(k){
+        var ts = ch.completedAt[k];
+        if(ts && new Date(ts).toDateString() === todayStr) count++;
+      });
+    });
+  });
+  return count;
+}
+function weakestSubject(){
+  var subjects = ["physics","chemistry","maths"];
+  var withData = subjects.filter(function(s){ return state.subjects[s].length > 0; });
+  if(!withData.length) return null;
+  var min = null;
+  withData.forEach(function(s){
+    var p = subjectPct(s);
+    if(min === null || p < min.pct){ min = {subj:s, pct:p}; }
+  });
+  return min;
+}
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  var target = new Date(dateStr + "T00:00:00");
+  var now = new Date();
+  now.setHours(0,0,0,0);
+  var diff = Math.ceil((target - now) / (1000*60*60*24));
+  return diff;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+/* ============================= ICONS ============================= */
+var ICON_SUN = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
+var ICON_MOON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+var ICON_CHECK = '<polyline points="20 6 9 17 4 12"></polyline>';
+var ICON_EDIT = '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>';
+var ICON_TRASH = '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>';
+
+/* ============================= RENDER: DASHBOARD ============================= */
+var RING_CIRCUMFERENCE = 2 * Math.PI * 52;
+
+function renderDashboard(){
+  var stats = overallStats();
+  document.getElementById("ringFg").style.strokeDasharray = RING_CIRCUMFERENCE;
+  document.getElementById("ringFg").style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - stats.overallPct/100);
+  document.getElementById("ringPct").textContent = stats.overallPct + "%";
+
+  var days = daysUntil(state.goal.examDate);
+  document.getElementById("daysLeftVal").textContent = (days === null) ? "—" : Math.max(days,0);
+  document.getElementById("chCompletedVal").textContent = stats.completedChapters;
+  document.getElementById("todayVal").textContent = todayTaskCount();
+
+  document.getElementById("goalBarPct").textContent = stats.overallPct + "%";
+  document.getElementById("goalBarFill").style.width = stats.overallPct + "%";
+
+  var setCta = document.getElementById("setDateCta");
+  setCta.style.display = state.goal.examDate ? "none" : "inline-block";
+
+  var weak = weakestSubject();
+  var weakWrap = document.getElementById("weakBadgeWrap");
+  if(weak && stats.totalChapters > 0){
+    weakWrap.innerHTML = '<span class="weak-badge">Weakest subject: ' + SUBJECT_LABELS[weak.subj] + ' (' + weak.pct + '%)</span>';
+  } else {
+    weakWrap.innerHTML = "";
+  }
+
+  var breakdown = document.getElementById("subjectBreakdown");
+  var subjects = ["physics","chemistry","maths"];
+  breakdown.innerHTML = subjects.map(function(s){
+    var pct = subjectPct(s);
+    return '<div class="subject-row">' +
+      '<span class="subject-dot" style="background:var(--' + s + ')"></span>' +
+      '<span class="subject-row-name">' + SUBJECT_LABELS[s] + '</span>' +
+      '<span class="subject-bar-track"><span class="subject-bar-fill" style="width:' + pct + '%;background:var(--' + s + ')"></span></span>' +
+      '<span class="subject-row-pct mono">' + pct + '%</span>' +
+      '</div>';
+  }).join("");
+
+  var statGrid = document.getElementById("statGrid");
+  var totalTasksCompleted = 0, totalTasksAll = 0;
+  subjects.forEach(function(s){
+    state.subjects[s].forEach(function(ch){
+      TASK_KEYS.forEach(function(k){ totalTasksAll++; if(ch.tasks[k]) totalTasksCompleted++; });
+    });
+  });
+  var tiles = [
+    {v: stats.overallPct + "%", k:"Overall progress"},
+    {v: subjectPct("physics") + "%", k:"Physics progress"},
+    {v: subjectPct("chemistry") + "%", k:"Chemistry progress"},
+    {v: subjectPct("maths") + "%", k:"Mathematics progress"},
+    {v: stats.completedChapters, k:"Chapters completed"},
+    {v: stats.remainingChapters, k:"Chapters remaining"},
+    {v: totalTasksCompleted + "/" + totalTasksAll, k:"Total tasks completed"},
+    {v: todayTaskCount(), k:"Tasks completed today"}
+  ];
+  statGrid.innerHTML = tiles.map(function(t){
+    return '<div class="card stat-tile"><div class="stat-val mono">' + t.v + '</div><div class="stat-key">' + t.k + '</div></div>';
+  }).join("");
+}
+
+/* ============================= RENDER: SUBJECT PAGES ============================= */
+var subjectUiState = {
+  physics: {search:"", filter:"all", addOpen:false, editingId:null},
+  chemistry: {search:"", filter:"all", addOpen:false, editingId:null},
+  maths: {search:"", filter:"all", addOpen:false, editingId:null}
+};
+
+function segColor(subj){ return "var(--" + subj + ")"; }
+
+function renderChapterCard(subj, ch){
+  var pct = chapterPct(ch);
+  var ui = subjectUiState[subj];
+  var isEditing = ui.editingId === ch.id;
+
+  var nameHtml = isEditing
+    ? '<input class="chapter-name-input" data-action="name-input" value="' + escapeAttr(ch.name) + '">'
+    : '<span class="chapter-name">' + escapeHtml(ch.name) + '</span>';
+
+  var actionsHtml = isEditing
+    ? '<button class="icon-btn" data-action="save-name" title="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' + ICON_CHECK + '</svg></button>'
+    : '<button class="icon-btn" data-action="edit-name" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICON_EDIT + '</svg></button>' +
+      '<button class="icon-btn danger" data-action="delete-chapter" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICON_TRASH + '</svg></button>';
+
+  var segsHtml = TASK_KEYS.map(function(k){
+    var on = ch.tasks[k];
+    return '<span class="seg" style="' + (on ? 'background:' + segColor(subj) : '') + '"></span>';
+  }).join("");
+
+  var chipsHtml = TASK_KEYS.map(function(k){
+    var on = ch.tasks[k];
+    return '<label class="check-chip ' + (on ? 'checked' : '') + '" data-action="toggle-task" data-task="' + k + '" style="' + (on ? 'background:' + colorSoft(subj) + ';border-color:' + segColor(subj) : '') + '">' +
+      '<span class="box" style="' + (on ? 'border-color:' + segColor(subj) + ';background:' + segColor(subj) : '') + '">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="' + (on ? '#fff' : 'currentColor') + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' + ICON_CHECK + '</svg>' +
+      '</span>' + TASK_LABELS[k] +
+      '</label>';
+  }).join("");
+
+  return '<div class="card chapter-card" data-id="' + ch.id + '">' +
+    '<div class="chapter-top">' +
+      '<div class="chapter-name-row">' + nameHtml + '</div>' +
+      '<div class="chapter-actions">' + actionsHtml + '</div>' +
+    '</div>' +
+    '<div class="chapter-pct-row"><span class="chapter-pct mono">' + pct + '%</span><div class="segbar">' + segsHtml + '</div></div>' +
+    '<div class="checklist">' + chipsHtml + '</div>' +
+    '<div class="revised-row">' +
+      '<span class="revised-label">Last revised</span>' +
+      '<input type="date" class="revised-input" data-action="revised-date" value="' + (ch.lastRevised || "") + '">' +
+    '</div>' +
+  '</div>';
+}
+
+function colorSoft(subj){ return "var(--" + subj + "-soft)"; }
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+function renderSubjectPage(subj){
+  var ui = subjectUiState[subj];
+  var list = state.subjects[subj].slice();
+
+  document.getElementById(subj + "HeadPct").textContent = subjectPct(subj) + "%";
+
+  var filtered = list.filter(function(ch){
+    var matchesSearch = ch.name.toLowerCase().indexOf(ui.search.toLowerCase()) !== -1;
+    if(!matchesSearch) return false;
+    if(ui.filter === "pending") return !isChapterComplete(ch);
+    if(ui.filter === "done") return isChapterComplete(ch);
+    return true;
+  });
+
+  var listEl = document.getElementById(subj + "List");
+  if(!filtered.length){
+    listEl.innerHTML = '<div class="empty-state">No chapters found. Try adjusting your search or filter, or add a new chapter above.</div>';
+  } else {
+    listEl.innerHTML = filtered.map(function(ch){ return renderChapterCard(subj, ch); }).join("");
+  }
+
+  var addFormEl = document.getElementById(subj + "AddForm");
+  if(ui.addOpen){
+    addFormEl.innerHTML = '<div class="add-form">' +
+      '<input class="search-input" id="' + subj + 'NewName" placeholder="New chapter name" autofocus>' +
+      '<button class="btn btn-primary btn-sm" data-action="confirm-add">Add</button>' +
+      '<button class="btn btn-sm" data-action="cancel-add">Cancel</button>' +
+      '</div>';
+    var inp = document.getElementById(subj + "NewName");
+    if(inp) inp.focus();
+  } else {
+    addFormEl.innerHTML = "";
+  }
+}
+
+/* ============================= RENDER: GOAL ============================= */
+function renderGoal(){
+  document.getElementById("examDateInput").value = state.goal.examDate || "";
+  document.getElementById("percentileInput").value = state.goal.percentile || "";
+
+  var days = daysUntil(state.goal.examDate);
+  var numEl = document.getElementById("goalCountdownNum");
+  var txtEl = document.getElementById("goalCountdownTxt");
+  if(days === null){
+    numEl.textContent = "—";
+    txtEl.textContent = "Set a date to start the countdown";
+  } else if(days < 0){
+    numEl.textContent = "0";
+    txtEl.textContent = "Exam date has passed";
+  } else {
+    numEl.textContent = days;
+    txtEl.textContent = days === 1 ? "day remaining until your exam" : "days remaining until your exam";
+  }
+}
+
+/* ============================= RENDER ALL ============================= */
+function renderAll(){
+  renderDashboard();
+  ["physics","chemistry","maths"].forEach(renderSubjectPage);
+  renderGoal();
+}
+
+/* ============================= EVENTS: TABS ============================= */
+document.getElementById("tabs").addEventListener("click", function(e){
+  var btn = e.target.closest(".tab-btn");
+  if(!btn) return;
+  document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+  btn.classList.add("active");
+  document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+  document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+document.getElementById("setDateCta").addEventListener("click", function(e){
+  e.preventDefault();
+  document.querySelector('.tab-btn[data-tab="goal"]').click();
+});
+
+/* ============================= EVENTS: THEME ============================= */
+function applyTheme(theme){
+  document.documentElement.classList.toggle("dark", theme === "dark");
+  document.getElementById("themeIcon").innerHTML = theme === "dark" ? ICON_SUN : ICON_MOON;
+}
+var savedTheme = localStorage.getItem(THEME_KEY);
+var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+var currentTheme = savedTheme || (prefersDark ? "dark" : "light");
+applyTheme(currentTheme);
+
+document.getElementById("themeToggle").addEventListener("click", function(){
+  currentTheme = currentTheme === "dark" ? "light" : "dark";
+  applyTheme(currentTheme);
+  localStorage.setItem(THEME_KEY, currentTheme);
+});
+
+/* ============================= EVENTS: SUBJECT PANELS ============================= */
+function setupSubjectPanel(subj){
+  var ui = subjectUiState[subj];
+
+  document.getElementById(subj + "Search").addEventListener("input", function(e){
+    ui.search = e.target.value;
+    renderSubjectPage(subj);
+  });
+
+  document.querySelector('.filter-seg[data-subject="' + subj + '"]').addEventListener("click", function(e){
+    var b = e.target.closest("button");
+    if(!b) return;
+    ui.filter = b.dataset.filter;
+    this.querySelectorAll("button").forEach(function(x){ x.classList.remove("active"); });
+    b.classList.add("active");
+    renderSubjectPage(subj);
+  });
+
+  document.getElementById(subj + "AddBtn").addEventListener("click", function(){
+    ui.addOpen = true;
+    renderSubjectPage(subj);
+  });
+
+  document.getElementById(subj + "AddForm").addEventListener("click", function(e){
+    var action = e.target.closest("[data-action]");
+    if(!action) return;
+    if(action.dataset.action === "confirm-add"){
+      var inp = document.getElementById(subj + "NewName");
+      var name = inp.value.trim();
+      if(name){
+        state.subjects[subj].push(makeChapter(name));
+        save();
+      }
+      ui.addOpen = false;
+      renderAll();
+    } else if(action.dataset.action === "cancel-add"){
+      ui.addOpen = false;
+      renderSubjectPage(subj);
+    }
+  });
+
+  document.getElementById(subj + "AddForm").addEventListener("keydown", function(e){
+    if(e.key === "Enter" && e.target.id === subj + "NewName"){
+      document.querySelector('#' + subj + 'AddForm [data-action="confirm-add"]').click();
+    } else if(e.key === "Escape" && e.target.id === subj + "NewName"){
+      document.querySelector('#' + subj + 'AddForm [data-action="cancel-add"]').click();
+    }
+  });
+
+  var listEl = document.getElementById(subj + "List");
+
+  listEl.addEventListener("click", function(e){
+    var card = e.target.closest(".chapter-card");
+    if(!card) return;
+    var id = card.dataset.id;
+    var chapter = state.subjects[subj].find(function(c){ return c.id === id; });
+    if(!chapter) return;
+
+    var chip = e.target.closest('[data-action="toggle-task"]');
+    if(chip){
+      var task = chip.dataset.task;
+      var newVal = !chapter.tasks[task];
+      chapter.tasks[task] = newVal;
+      chapter.completedAt[task] = newVal ? Date.now() : null;
+      save();
+      renderAll();
+      return;
+    }
+
+    var editBtn = e.target.closest('[data-action="edit-name"]');
+    if(editBtn){
+      ui.editingId = id;
+      renderSubjectPage(subj);
+      var inputEl = listEl.querySelector('.chapter-name-input');
+      if(inputEl){ inputEl.focus(); inputEl.select(); }
+      return;
+    }
+
+    var saveBtn = e.target.closest('[data-action="save-name"]');
+    if(saveBtn){
+      var nameInput = card.querySelector('[data-action="name-input"]');
+      var newName = nameInput.value.trim();
+      if(newName) chapter.name = newName;
+      ui.editingId = null;
+      save();
+      renderAll();
+      return;
+    }
+
+    var delBtn = e.target.closest('[data-action="delete-chapter"]');
+    if(delBtn){
+      if(window.confirm('Delete "' + chapter.name + '"? This cannot be undone.')){
+        state.subjects[subj] = state.subjects[subj].filter(function(c){ return c.id !== id; });
+        save();
+        renderAll();
+      }
+      return;
+    }
+  });
+
+  listEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" && e.target.matches('[data-action="name-input"]')){
+      var card = e.target.closest(".chapter-card");
+      card.querySelector('[data-action="save-name"]').click();
+    } else if(e.key === "Escape" && e.target.matches('[data-action="name-input"]')){
+      ui.editingId = null;
+      renderSubjectPage(subj);
+    }
+  });
+
+  listEl.addEventListener("change", function(e){
+    if(e.target.matches('[data-action="revised-date"]')){
+      var card = e.target.closest(".chapter-card");
+      var id2 = card.dataset.id;
+      var chapter2 = state.subjects[subj].find(function(c){ return c.id === id2; });
+      if(chapter2){
+        chapter2.lastRevised = e.target.value;
+        save();
+      }
+    }
+  });
+}
+["physics","chemistry","maths"].forEach(setupSubjectPanel);
+
+/* ============================= EVENTS: GOAL ============================= */
+document.getElementById("examDateInput").addEventListener("change", function(e){
+  state.goal.examDate = e.target.value;
+  save();
+  renderAll();
+});
+document.getElementById("percentileInput").addEventListener("input", function(e){
+  state.goal.percentile = e.target.value;
+  save();
+});
+
+document.getElementById("exportBtn").addEventListener("click", function(){
+  var blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var dateTag = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = "jee-tracker-backup-" + dateTag + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("importBtn").addEventListener("click", function(){
+  document.getElementById("importFile").click();
+});
+document.getElementById("importFile").addEventListener("change", function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      var parsed = JSON.parse(ev.target.result);
+      if(!parsed.subjects || !parsed.goal) throw new Error("Invalid file");
+      ["physics","chemistry","maths"].forEach(function(s){
+        if(!Array.isArray(parsed.subjects[s])) parsed.subjects[s] = [];
+        parsed.subjects[s].forEach(function(ch){
+          if(!ch.id) ch.id = uid();
+          if(!ch.tasks) ch.tasks = emptyTasks();
+          if(!ch.completedAt) ch.completedAt = {};
+          if(typeof ch.lastRevised !== "string") ch.lastRevised = "";
+        });
+      });
+      if(!parsed.goal.examDate) parsed.goal.examDate = "";
+      if(parsed.goal.percentile === undefined) parsed.goal.percentile = "";
+      state = parsed;
+      save();
+      renderAll();
+      alert("Data imported successfully.");
+    }catch(err){
+      alert("Could not import this file. Please make sure it's a valid JEE Tracker export.");
+    }
+    e.target.value = "";
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById("resetBtn").addEventListener("click", function(){
+  if(window.confirm("This will permanently delete all your progress and reset to the default syllabus. Continue?")){
+    state = seedData();
+    save();
+    renderAll();
+  }
+});
+
+/* ============================= INIT ============================= */
+renderAll();
+
+})();
 </script>
 </body>
 </html>
