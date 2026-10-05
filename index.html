@@ -11,7 +11,6 @@
 
 <style>
 /* ============================= TOKENS ============================= */
-
 :root{
   --bg:#F6F7F9;
   --surface:#FFFFFF;
@@ -20,19 +19,14 @@
   --text:#171B23;
   --text-muted:#6B7280;
   --text-faint:#9AA1AC;
-
   --accent:#3E63DD;
   --accent-soft:#E9EDFD;
-
   --physics:#2F6FED;
   --physics-soft:#E7EFFE;
-
   --chemistry:#0EA968;
   --chemistry-soft:#E4F8EF;
-
   --maths:#C7791A;
   --maths-soft:#FBEEDD;
-
   --danger:#E5484D;
   --danger-soft:#FCEBEC;
 
@@ -44,7 +38,8 @@
     0 1px 2px rgba(20,24,32,.04),
     0 6px 20px rgba(20,24,32,.04);
 
-  --shadow-pop:0 10px 30px rgba(20,24,32,.10);
+  --shadow-pop:
+    0 10px 30px rgba(20,24,32,.10);
 
   --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',monospace;
@@ -60,19 +55,14 @@ html.dark{
   --text:#E8EAED;
   --text-muted:#9AA1AC;
   --text-faint:#6B7280;
-
   --accent:#6E8CF5;
   --accent-soft:#1D2440;
-
   --physics:#5B8DF9;
   --physics-soft:#182338;
-
   --chemistry:#2FD98B;
   --chemistry-soft:#132A22;
-
   --maths:#F0A93A;
   --maths-soft:#2C2110;
-
   --danger:#F5716F;
   --danger-soft:#2B1518;
 
@@ -104,7 +94,7 @@ body{
   background:var(--accent-soft);
 }
 
-button,input,select{
+button,input{
   font-family:inherit;
 }
 
@@ -251,7 +241,6 @@ main{
     opacity:0;
     transform:translateY(8px);
   }
-
   to{
     opacity:1;
     transform:translateY(0);
@@ -633,11 +622,6 @@ html.dark .btn-primary:hover{
   gap:8px;
   margin-bottom:14px;
   animation:fadeSlideIn .25s ease;
-  flex-wrap:wrap;
-}
-
-.add-form .search-input{
-  min-width:180px;
 }
 
 .chapter-list{
@@ -719,6 +703,8 @@ html.dark .btn-primary:hover{
   height:15px;
 }
 
+/* ============================= PROGRESS ============================= */
+
 .chapter-pct-row{
   display:flex;
   align-items:center;
@@ -747,16 +733,11 @@ html.dark .btn-primary:hover{
   transition:background .2s ease;
 }
 
+/* Only Done + Revised now */
 .checklist{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:7px;
-}
-
-@media(min-width:520px){
-  .checklist{
-    grid-template-columns:repeat(2,1fr);
-  }
 }
 
 .check-chip{
@@ -790,6 +771,10 @@ html.dark .btn-primary:hover{
   transition:all .15s ease;
 }
 
+.check-chip.checked{
+  color:var(--text);
+}
+
 .check-chip .box svg{
   width:10px;
   height:10px;
@@ -798,19 +783,76 @@ html.dark .btn-primary:hover{
   transition:all .15s ease;
 }
 
-.check-chip.checked{
-  color:var(--text);
-  border-color:transparent;
-}
-
 .check-chip.checked .box svg{
   opacity:1;
   transform:scale(1);
 }
 
-/* ============================= WEIGHTAGE ============================= */
+/* ============================= WEIGHTAGE SECTIONS ============================= */
 
-.weightage-row{
+.weightage-switch{
+  display:flex;
+  gap:6px;
+  margin-bottom:14px;
+}
+
+.weightage-btn{
+  flex:1;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text-muted);
+  border-radius:var(--radius-md);
+  padding:10px 12px;
+  font-size:12.5px;
+  font-weight:700;
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+
+.weightage-btn:hover{
+  background:var(--surface-2);
+}
+
+.weightage-btn.active{
+  background:var(--text);
+  color:var(--bg);
+  border-color:var(--text);
+}
+
+html.dark .weightage-btn.active{
+  background:var(--accent);
+  color:#0C0E12;
+  border-color:var(--accent);
+}
+
+.weightage-section{
+  margin-top:22px;
+}
+
+.weightage-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 2px 10px;
+}
+
+.weightage-heading-title{
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:var(--text-faint);
+}
+
+.weightage-count{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-faint);
+}
+
+/* ============================= REVISED ============================= */
+
+.revised-row{
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -820,55 +862,19 @@ html.dark .btn-primary:hover{
   border-top:1px solid var(--border);
 }
 
-.weightage-label{
+.revised-label{
   font-size:11.5px;
   color:var(--text-faint);
 }
 
-.weightage-select{
+.revised-input{
   border:1px solid var(--border);
   background:var(--surface);
-  color:var(--text);
-  border-radius:var(--radius-sm);
-  padding:6px 9px;
-  font-size:12px;
-  font-family:var(--font-ui);
-  outline:none;
-}
-
-.weightage-select:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-soft);
-}
-
-.weightage-section{
-  margin-bottom:24px;
-}
-
-.weightage-section-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  font-size:12px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.07em;
-  color:var(--text-faint);
-  margin:22px 2px 10px;
-}
-
-.weightage-section:first-child .weightage-section-title{
-  margin-top:0;
-}
-
-.weightage-count{
-  font-family:var(--font-mono);
-  font-size:11px;
-  padding:3px 7px;
-  border-radius:999px;
-  background:var(--surface-2);
   color:var(--text-muted);
+  border-radius:var(--radius-sm);
+  padding:5px 8px;
+  font-size:12px;
+  font-family:var(--font-mono);
 }
 
 /* ============================= EMPTY ============================= */
@@ -958,36 +964,31 @@ footer{
   color:var(--text-faint);
 }
 
-/* ============================= MOBILE ============================= */
+@media(min-width:520px){
+  .checklist{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
 
-@media(max-width:520px){
-
-  .app{
-    padding-left:12px;
-    padding-right:12px;
+@media(max-width:480px){
+  .weightage-switch{
+    flex-direction:column;
   }
 
-  .topbar-inner{
-    padding-left:12px;
-    padding-right:12px;
+  .toolbar{
+    flex-direction:column;
   }
 
-  .tabs{
-    padding-left:12px;
-    padding-right:12px;
+  .filter-seg{
+    width:100%;
+  }
+
+  .filter-seg button{
+    flex:1;
   }
 
   .stat-grid{
     grid-template-columns:repeat(2,1fr);
-  }
-
-  .add-form .search-input{
-    width:100%;
-    flex-basis:100%;
-  }
-
-  .weightage-select{
-    max-width:160px;
   }
 }
 </style>
@@ -996,61 +997,34 @@ footer{
 <body>
 
 <div class="topbar">
-
   <div class="topbar-inner">
-
     <div class="brand">
       <div class="brand-name">JEE Tracker</div>
       <div class="brand-sub">Preparation Dashboard</div>
     </div>
 
-    <button
-      class="theme-toggle"
-      id="themeToggle"
-      aria-label="Toggle theme"
-    >
-      <svg
-        id="themeIcon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg id="themeIcon"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
       </svg>
     </button>
-
   </div>
 
   <div class="tabs" id="tabs">
-
-    <button class="tab-btn active" data-tab="dashboard">
-      Dashboard
-    </button>
-
-    <button class="tab-btn" data-tab="physics">
-      Physics
-    </button>
-
-    <button class="tab-btn" data-tab="chemistry">
-      Chemistry
-    </button>
-
-    <button class="tab-btn" data-tab="maths">
-      Mathematics
-    </button>
-
-    <button class="tab-btn" data-tab="goal">
-      Goal &amp; Data
-    </button>
-
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="physics">Physics</button>
+    <button class="tab-btn" data-tab="chemistry">Chemistry</button>
+    <button class="tab-btn" data-tab="maths">Mathematics</button>
+    <button class="tab-btn" data-tab="goal">Goal &amp; Data</button>
   </div>
-
 </div>
 
-
 <div class="app">
-
 <main>
 
 <!-- ============================= DASHBOARD ============================= -->
@@ -1060,142 +1034,82 @@ footer{
   <div class="card hero-card">
 
     <div class="ring-wrap">
-
       <svg viewBox="0 0 120 120">
-
-        <circle
-          class="ring-bg"
-          cx="60"
-          cy="60"
-          r="52">
+        <circle class="ring-bg"
+                cx="60"
+                cy="60"
+                r="52">
         </circle>
 
-        <circle
-          class="ring-fg"
-          id="ringFg"
-          cx="60"
-          cy="60"
-          r="52"
-          transform="rotate(-90 60 60)">
+        <circle class="ring-fg"
+                id="ringFg"
+                cx="60"
+                cy="60"
+                r="52"
+                transform="rotate(-90 60 60)">
         </circle>
-
       </svg>
 
       <div class="ring-center">
-
-        <div class="ring-pct" id="ringPct">
-          0%
-        </div>
-
-        <div class="ring-label">
-          Overall
-        </div>
-
+        <div class="ring-pct" id="ringPct">0%</div>
+        <div class="ring-label">Overall</div>
       </div>
-
     </div>
-
 
     <div class="hero-meta">
 
       <div class="hero-meta-item">
-
-        <div class="hero-meta-val mono" id="daysLeftVal">
-          —
-        </div>
-
-        <div class="hero-meta-key">
-          Days left
-        </div>
-
+        <div class="hero-meta-val mono" id="daysLeftVal">—</div>
+        <div class="hero-meta-key">Days left</div>
       </div>
 
-
       <div class="hero-meta-item">
-
-        <div class="hero-meta-val mono" id="chCompletedVal">
-          0
-        </div>
-
-        <div class="hero-meta-key">
-          Chapters done
-        </div>
-
+        <div class="hero-meta-val mono" id="chCompletedVal">0</div>
+        <div class="hero-meta-key">Chapters done</div>
       </div>
 
-
       <div class="hero-meta-item">
-
-        <div class="hero-meta-val mono" id="todayVal">
-          0
-        </div>
-
-        <div class="hero-meta-key">
-          Today's tasks
-        </div>
-
+        <div class="hero-meta-val mono" id="todayVal">0</div>
+        <div class="hero-meta-key">Today's tasks</div>
       </div>
 
     </div>
 
-
     <div class="goal-bar-row">
-
       <div class="goal-bar-caption">
-
-        <span>
-          Syllabus goal
-        </span>
-
-        <span id="goalBarPct">
-          0%
-        </span>
-
+        <span>Syllabus goal</span>
+        <span id="goalBarPct">0%</span>
       </div>
 
       <div class="goal-bar-track">
-
-        <div
-          class="goal-bar-fill"
-          id="goalBarFill"
-          style="width:0%">
+        <div class="goal-bar-fill"
+             id="goalBarFill"
+             style="width:0%">
         </div>
-
       </div>
-
     </div>
-
 
     <div id="weakBadgeWrap"></div>
 
-    <a
-      href="#"
-      class="cta-link"
-      id="setDateCta"
-      style="display:none;">
-      Set your exam date →
+    <a href="#"
+       class="cta-link"
+       id="setDateCta"
+       style="display:none;">
+       Set your exam date →
     </a>
 
   </div>
 
+  <div class="section-title">Subject breakdown</div>
 
-  <div class="section-title">
-    Subject breakdown
+  <div class="card subject-progress-card"
+       id="subjectBreakdown">
   </div>
 
-  <div
-    class="card subject-progress-card"
-    id="subjectBreakdown">
-  </div>
+  <div class="section-title">Statistics</div>
 
-
-  <div class="section-title">
-    Statistics
-  </div>
-
-  <div
-    class="stat-grid"
-    id="statGrid">
+  <div class="stat-grid"
+       id="statGrid">
   </div>
 
 </section>
@@ -1206,23 +1120,11 @@ footer{
 <section class="panel" id="panel-physics">
 
   <div class="subject-header">
-
     <div class="subject-title">
-
-      <h2>
-        Physics
-      </h2>
-
-      <span
-        class="mono"
-        id="physicsHeadPct">
-        0%
-      </span>
-
+      <h2>Physics</h2>
+      <span class="mono" id="physicsHeadPct">0%</span>
     </div>
-
   </div>
-
 
   <div class="toolbar">
 
@@ -1231,28 +1133,33 @@ footer{
       id="physicsSearch"
       placeholder="Search chapters…">
 
-    <div
-      class="filter-seg"
-      data-subject="physics">
+    <div class="filter-seg"
+         data-subject="physics">
 
-      <button
-        data-filter="all"
-        class="active">
-        All
-      </button>
-
-      <button data-filter="pending">
-        Pending
-      </button>
-
-      <button data-filter="done">
-        Done
-      </button>
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="pending">Pending</button>
+      <button data-filter="done">Done</button>
 
     </div>
 
   </div>
 
+  <div class="weightage-switch"
+       data-weightage-subject="physics">
+
+    <button
+      class="weightage-btn active"
+      data-weightage="high">
+      High Weightage
+    </button>
+
+    <button
+      class="weightage-btn"
+      data-weightage="low">
+      Low Weightage
+    </button>
+
+  </div>
 
   <button
     class="btn btn-primary"
@@ -1263,10 +1170,7 @@ footer{
 
   <div id="physicsAddForm"></div>
 
-  <div
-    class="chapter-list"
-    id="physicsList">
-  </div>
+  <div id="physicsList"></div>
 
 </section>
 
@@ -1276,23 +1180,11 @@ footer{
 <section class="panel" id="panel-chemistry">
 
   <div class="subject-header">
-
     <div class="subject-title">
-
-      <h2>
-        Chemistry
-      </h2>
-
-      <span
-        class="mono"
-        id="chemistryHeadPct">
-        0%
-      </span>
-
+      <h2>Chemistry</h2>
+      <span class="mono" id="chemistryHeadPct">0%</span>
     </div>
-
   </div>
-
 
   <div class="toolbar">
 
@@ -1301,28 +1193,33 @@ footer{
       id="chemistrySearch"
       placeholder="Search chapters…">
 
-    <div
-      class="filter-seg"
-      data-subject="chemistry">
+    <div class="filter-seg"
+         data-subject="chemistry">
 
-      <button
-        data-filter="all"
-        class="active">
-        All
-      </button>
-
-      <button data-filter="pending">
-        Pending
-      </button>
-
-      <button data-filter="done">
-        Done
-      </button>
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="pending">Pending</button>
+      <button data-filter="done">Done</button>
 
     </div>
 
   </div>
 
+  <div class="weightage-switch"
+       data-weightage-subject="chemistry">
+
+    <button
+      class="weightage-btn active"
+      data-weightage="high">
+      High Weightage
+    </button>
+
+    <button
+      class="weightage-btn"
+      data-weightage="low">
+      Low Weightage
+    </button>
+
+  </div>
 
   <button
     class="btn btn-primary"
@@ -1333,36 +1230,21 @@ footer{
 
   <div id="chemistryAddForm"></div>
 
-  <div
-    class="chapter-list"
-    id="chemistryList">
-  </div>
+  <div id="chemistryList"></div>
 
 </section>
 
 
-<!-- ============================= MATHS ============================= -->
+<!-- ============================= MATHEMATICS ============================= -->
 
 <section class="panel" id="panel-maths">
 
   <div class="subject-header">
-
     <div class="subject-title">
-
-      <h2>
-        Mathematics
-      </h2>
-
-      <span
-        class="mono"
-        id="mathsHeadPct">
-        0%
-      </span>
-
+      <h2>Mathematics</h2>
+      <span class="mono" id="mathsHeadPct">0%</span>
     </div>
-
   </div>
-
 
   <div class="toolbar">
 
@@ -1371,28 +1253,33 @@ footer{
       id="mathsSearch"
       placeholder="Search chapters…">
 
-    <div
-      class="filter-seg"
-      data-subject="maths">
+    <div class="filter-seg"
+         data-subject="maths">
 
-      <button
-        data-filter="all"
-        class="active">
-        All
-      </button>
-
-      <button data-filter="pending">
-        Pending
-      </button>
-
-      <button data-filter="done">
-        Done
-      </button>
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="pending">Pending</button>
+      <button data-filter="done">Done</button>
 
     </div>
 
   </div>
 
+  <div class="weightage-switch"
+       data-weightage-subject="maths">
+
+    <button
+      class="weightage-btn active"
+      data-weightage="high">
+      High Weightage
+    </button>
+
+    <button
+      class="weightage-btn"
+      data-weightage="low">
+      Low Weightage
+    </button>
+
+  </div>
 
   <button
     class="btn btn-primary"
@@ -1403,10 +1290,7 @@ footer{
 
   <div id="mathsAddForm"></div>
 
-  <div
-    class="chapter-list"
-    id="mathsList">
-  </div>
+  <div id="mathsList"></div>
 
 </section>
 
@@ -1415,10 +1299,7 @@ footer{
 
 <section class="panel" id="panel-goal">
 
-  <div class="section-title">
-    Your goal
-  </div>
-
+  <div class="section-title">Your goal</div>
 
   <div class="card goal-card">
 
@@ -1433,7 +1314,6 @@ footer{
         id="examDateInput">
 
     </div>
-
 
     <div class="field">
 
@@ -1450,7 +1330,6 @@ footer{
         placeholder="e.g. 99.5">
 
     </div>
-
 
     <div class="countdown-strip">
 
@@ -1471,24 +1350,17 @@ footer{
   </div>
 
 
-  <div class="section-title">
-    Data
-  </div>
-
+  <div class="section-title">Data</div>
 
   <div class="card goal-card">
 
     <div class="data-actions">
 
-      <button
-        class="btn"
-        id="exportBtn">
+      <button class="btn" id="exportBtn">
         Export as JSON
       </button>
 
-      <button
-        class="btn"
-        id="importBtn">
+      <button class="btn" id="importBtn">
         Import JSON
       </button>
 
@@ -1498,18 +1370,16 @@ footer{
         accept="application/json"
         style="display:none;">
 
-      <button
-        class="btn btn-danger"
-        id="resetBtn">
+      <button class="btn btn-danger" id="resetBtn">
         Reset all data
       </button>
 
     </div>
 
-
     <div class="hint">
-      All data is stored only in this browser's local storage — nothing is sent anywhere.
-      Export regularly to back up or move your progress to another device.
+      All data is stored only in this browser's local storage —
+      nothing is sent anywhere. Export regularly to back up or
+      move your progress to another device.
     </div>
 
   </div>
@@ -1517,7 +1387,6 @@ footer{
 </section>
 
 </main>
-
 
 <footer>
   Your data stays on this device.
@@ -1528,7 +1397,6 @@ footer{
 
 <script>
 (function(){
-
 "use strict";
 
 /* ============================= DEFAULT SYLLABUS ============================= */
@@ -1615,16 +1483,84 @@ var DEFAULT_CHAPTERS = {
     "Trigonometry",
     "Mathematical Reasoning"
   ]
+};
+
+
+/* ============================= WEIGHTAGE ============================= */
+/*
+   High-weightage chapters are assigned here.
+   Any chapter not present in these lists is automatically Low Weightage.
+*/
+
+var HIGH_WEIGHTAGE = {
+
+  physics:[
+    "Motion in a Straight Line",
+    "Motion in a Plane",
+    "Laws of Motion",
+    "Work, Energy and Power",
+    "System of Particles and Rotational Motion",
+    "Thermodynamics",
+    "Oscillations",
+    "Waves",
+    "Electric Charges and Fields",
+    "Electrostatic Potential and Capacitance",
+    "Current Electricity",
+    "Moving Charges and Magnetism",
+    "Electromagnetic Induction",
+    "Alternating Current",
+    "Ray Optics and Optical Instruments",
+    "Wave Optics",
+    "Dual Nature of Radiation and Matter",
+    "Atoms",
+    "Nuclei",
+    "Semiconductor Electronics"
+  ],
+
+  chemistry:[
+    "Some Basic Concepts of Chemistry",
+    "Structure of Atom",
+    "Classification of Elements and Periodicity",
+    "Chemical Bonding and Molecular Structure",
+    "Thermodynamics",
+    "Equilibrium",
+    "Redox Reactions",
+    "Solutions",
+    "Electrochemistry",
+    "Chemical Kinetics",
+    "p-Block Elements",
+    "d and f Block Elements",
+    "Coordination Compounds",
+    "Basic Principles of Organic Chemistry",
+    "Hydrocarbons",
+    "Haloalkanes and Haloarenes",
+    "Alcohols, Phenols and Ethers",
+    "Aldehydes, Ketones and Carboxylic Acids",
+    "Amines",
+    "Biomolecules"
+  ],
+
+  maths:[
+    "Complex Numbers and Quadratic Equations",
+    "Matrices and Determinants",
+    "Permutations and Combinations",
+    "Binomial Theorem",
+    "Sequences and Series",
+    "Limits, Continuity and Differentiability",
+    "Application of Derivatives",
+    "Integral Calculus",
+    "Differential Equations",
+    "Coordinate Geometry",
+    "Three Dimensional Geometry",
+    "Vector Algebra",
+    "Statistics and Probability",
+    "Trigonometry"
+  ]
 
 };
 
 
-/* ============================= TASKS ============================= */
-
-var TASK_KEYS = [
-  "done",
-  "revised"
-];
+var TASK_KEYS = ["done","revised"];
 
 var TASK_LABELS = {
   done:"Done",
@@ -1644,35 +1580,34 @@ var THEME_KEY = "jee-tracker-theme";
 /* ============================= HELPERS ============================= */
 
 function uid(){
-
   return Date.now().toString(36) +
-    Math.random().toString(36).slice(2,8);
-
+         Math.random().toString(36).slice(2,8);
 }
 
+function isHighWeightage(subj,name){
+  return HIGH_WEIGHTAGE[subj].indexOf(name) !== -1;
+}
 
 function emptyTasks(){
-
   return {
     done:false,
     revised:false
   };
-
 }
 
-
 function makeChapter(name,weightage){
-
   return {
     id:uid(),
     name:name,
-    weightage:weightage || "high",
+    weightage:weightage || "low",
     tasks:emptyTasks(),
-    completedAt:{}
+    completedAt:{
+      done:null,
+      revised:null
+    },
+    lastRevised:""
   };
-
 }
-
 
 function seedData(){
 
@@ -1688,19 +1623,64 @@ function seedData(){
 
     data.subjects[subj] =
       DEFAULT_CHAPTERS[subj].map(function(name){
-        return makeChapter(name,"high");
+
+        return makeChapter(
+          name,
+          isHighWeightage(subj,name) ? "high" : "low"
+        );
+
       });
 
   });
 
   return data;
-
 }
 
 
 /* ============================= STATE ============================= */
 
 var state = load();
+
+function migrateChapter(ch,subj){
+
+  if(!ch.id){
+    ch.id = uid();
+  }
+
+  if(!ch.name){
+    ch.name = "Untitled Chapter";
+  }
+
+  /*
+    Old chapters had six tasks.
+    We intentionally discard those old task states because
+    the tracker has now moved to Done + Revised.
+  */
+
+  ch.tasks = {
+    done:false,
+    revised:false
+  };
+
+  ch.completedAt = {
+    done:null,
+    revised:null
+  };
+
+  if(typeof ch.lastRevised !== "string"){
+    ch.lastRevised = "";
+  }
+
+  if(ch.weightage !== "high" && ch.weightage !== "low"){
+
+    ch.weightage =
+      isHighWeightage(subj,ch.name)
+      ? "high"
+      : "low";
+  }
+
+  return ch;
+}
 
 
 function load(){
@@ -1719,69 +1699,18 @@ function load(){
       return seedData();
     }
 
-
     ["physics","chemistry","maths"].forEach(function(s){
 
       if(!Array.isArray(parsed.subjects[s])){
         parsed.subjects[s] = [];
       }
 
+      parsed.subjects[s] =
+        parsed.subjects[s].map(function(ch){
+          return migrateChapter(ch,s);
+        });
 
-      parsed.subjects[s].forEach(function(ch){
-
-        /*
-         * Migration from the old version.
-         *
-         * If the old six tasks existed,
-         * all six being complete becomes Done.
-         */
-
-        if(!ch.tasks || ch.tasks.done === undefined){
-
-          var oldTasks = ch.tasks || {};
-
-          var oldDone =
-            !!oldTasks.lecture &&
-            !!oldTasks.notes &&
-            !!oldTasks.examples &&
-            !!oldTasks.dpp &&
-            !!oldTasks.pyq &&
-            !!oldTasks.shortnotes;
-
-          ch.tasks = {
-            done:oldDone,
-            revised:!!ch.lastRevised
-          };
-
-        }else{
-
-          if(typeof ch.tasks.done !== "boolean"){
-            ch.tasks.done = false;
-          }
-
-          if(typeof ch.tasks.revised !== "boolean"){
-            ch.tasks.revised = false;
-          }
-
-        }
-
-
-        if(!ch.completedAt){
-          ch.completedAt = {};
-        }
-
-
-        if(!ch.weightage){
-          ch.weightage = "high";
-        }
-
-
-        delete ch.lastRevised;
-
-      });
-
-    }
-
+    });
 
     return parsed;
 
@@ -1795,12 +1724,10 @@ function load(){
 
 
 function save(){
-
   localStorage.setItem(
     STORAGE_KEY,
     JSON.stringify(state)
   );
-
 }
 
 
@@ -1821,14 +1748,14 @@ function chapterPct(ch){
   return Math.round(
     (done / TASK_KEYS.length) * 100
   );
-
 }
 
 
 function isChapterComplete(ch){
 
-  return ch.tasks.done &&
-         ch.tasks.revised;
+  return TASK_KEYS.every(function(k){
+    return ch.tasks[k];
+  });
 
 }
 
@@ -1844,15 +1771,12 @@ function subjectPct(subj){
   var total = 0;
 
   list.forEach(function(ch){
-
     total += chapterPct(ch);
-
   });
 
   return Math.round(
     total / list.length
   );
-
 }
 
 
@@ -1869,13 +1793,11 @@ function overallStats(){
   var totalTaskPct = 0;
   var chapterCount = 0;
 
-
   subjects.forEach(function(s){
 
     state.subjects[s].forEach(function(ch){
 
       totalChapters++;
-
       chapterCount++;
 
       totalTaskPct += chapterPct(ch);
@@ -1888,12 +1810,10 @@ function overallStats(){
 
   });
 
-
   var overallPct =
     chapterCount
-      ? Math.round(totalTaskPct / chapterCount)
-      : 0;
-
+    ? Math.round(totalTaskPct / chapterCount)
+    : 0;
 
   return {
 
@@ -1918,7 +1838,6 @@ function todayTaskCount(){
 
   var count = 0;
 
-
   ["physics","chemistry","maths"].forEach(function(s){
 
     state.subjects[s].forEach(function(ch){
@@ -1940,9 +1859,7 @@ function todayTaskCount(){
 
   });
 
-
   return count;
-
 }
 
 
@@ -1959,14 +1876,11 @@ function weakestSubject(){
       return state.subjects[s].length > 0;
     });
 
-
   if(!withData.length){
     return null;
   }
 
-
   var min = null;
-
 
   withData.forEach(function(s){
 
@@ -1976,19 +1890,15 @@ function weakestSubject(){
       min === null ||
       p < min.pct
     ){
-
       min = {
         subj:s,
         pct:p
       };
-
     }
 
   });
 
-
   return min;
-
 }
 
 
@@ -1998,7 +1908,6 @@ function daysUntil(dateStr){
     return null;
   }
 
-
   var target =
     new Date(dateStr + "T00:00:00");
 
@@ -2006,49 +1915,37 @@ function daysUntil(dateStr){
 
   now.setHours(0,0,0,0);
 
-
   var diff =
     Math.ceil(
-      (target - now) /
+      (target-now) /
       (1000*60*60*24)
     );
 
-
   return diff;
-
 }
 
 
 /* ============================= ICONS ============================= */
 
 var ICON_SUN =
-  '<circle cx="12" cy="12" r="4"></circle>' +
-  '<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41' +
-  'M17.66 17.66l1.41 1.41M2 12h2M20 12h2' +
-  'M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
-
+'<circle cx="12" cy="12" r="4"></circle>' +
+'<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
 
 var ICON_MOON =
-  '<path d="M21 12.79A9 9 0 1 1 11.21 3' +
-  ' 7 7 0 0 0 21 12.79z"/>';
-
+'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
 
 var ICON_CHECK =
-  '<polyline points="20 6 9 17 4 12"></polyline>';
-
+'<polyline points="20 6 9 17 4 12"></polyline>';
 
 var ICON_EDIT =
-  '<path d="M12 20h9"/>' +
-  '<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>';
-
+'<path d="M12 20h9"/>' +
+'<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>';
 
 var ICON_TRASH =
-  '<polyline points="3 6 5 6 21 6"/>' +
-  '<path d="M19 6l-1 14a2 2 0 0 1-2 2H8' +
-  'a2 2 0 0 1-2-2L5 6"/>' +
-  '<path d="M10 11v6M14 11v6"/>' +
-  '<path d="M9 6V4a1 1 0 0 1 1-1h4' +
-  'a1 1 0 0 1 1 1v2"/>';
+'<polyline points="3 6 5 6 21 6"/>' +
+'<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>' +
+'<path d="M10 11v6M14 11v6"/>' +
+'<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>';
 
 
 /* ============================= DASHBOARD ============================= */
@@ -2061,17 +1958,14 @@ function renderDashboard(){
 
   var stats = overallStats();
 
-
   document.getElementById("ringFg")
     .style.strokeDasharray =
     RING_CIRCUMFERENCE;
-
 
   document.getElementById("ringFg")
     .style.strokeDashoffset =
     RING_CIRCUMFERENCE *
     (1 - stats.overallPct/100);
-
 
   document.getElementById("ringPct")
     .textContent =
@@ -2081,18 +1975,15 @@ function renderDashboard(){
   var days =
     daysUntil(state.goal.examDate);
 
-
   document.getElementById("daysLeftVal")
     .textContent =
     days === null
-      ? "—"
-      : Math.max(days,0);
-
+    ? "—"
+    : Math.max(days,0);
 
   document.getElementById("chCompletedVal")
     .textContent =
     stats.completedChapters;
-
 
   document.getElementById("todayVal")
     .textContent =
@@ -2103,7 +1994,6 @@ function renderDashboard(){
     .textContent =
     stats.overallPct + "%";
 
-
   document.getElementById("goalBarFill")
     .style.width =
     stats.overallPct + "%";
@@ -2112,20 +2002,17 @@ function renderDashboard(){
   var setCta =
     document.getElementById("setDateCta");
 
-
   setCta.style.display =
     state.goal.examDate
-      ? "none"
-      : "inline-block";
+    ? "none"
+    : "inline-block";
 
 
   var weak =
     weakestSubject();
 
-
   var weakWrap =
     document.getElementById("weakBadgeWrap");
-
 
   if(
     weak &&
@@ -2136,8 +2023,9 @@ function renderDashboard(){
       '<span class="weak-badge">' +
       'Weakest subject: ' +
       SUBJECT_LABELS[weak.subj] +
-      ' (' + weak.pct + '%)' +
-      '</span>';
+      ' (' +
+      weak.pct +
+      '%)</span>';
 
   }else{
 
@@ -2151,13 +2039,11 @@ function renderDashboard(){
       "subjectBreakdown"
     );
 
-
   var subjects = [
     "physics",
     "chemistry",
     "maths"
   ];
-
 
   breakdown.innerHTML =
     subjects.map(function(s){
@@ -2165,10 +2051,1655 @@ function renderDashboard(){
       var pct =
         subjectPct(s);
 
-
       return (
         '<div class="subject-row">' +
 
-          '<span class="subject-dot" ' +
-          'style="background:var(--' +
-         
+        '<span class="subject-dot" ' +
+        'style="background:var(--' +
+        s +
+        ')"></span>' +
+
+        '<span class="subject-row-name">' +
+        SUBJECT_LABELS[s] +
+        '</span>' +
+
+        '<span class="subject-bar-track">' +
+
+        '<span class="subject-bar-fill" ' +
+        'style="width:' +
+        pct +
+        '%;background:var(--' +
+        s +
+        ')"></span>' +
+
+        '</span>' +
+
+        '<span class="subject-row-pct mono">' +
+        pct +
+        '%</span>' +
+
+        '</div>'
+      );
+
+    }).join("");
+
+
+  var statGrid =
+    document.getElementById(
+      "statGrid"
+    );
+
+  var totalTasksCompleted = 0;
+  var totalTasksAll = 0;
+
+  subjects.forEach(function(s){
+
+    state.subjects[s].forEach(function(ch){
+
+      TASK_KEYS.forEach(function(k){
+
+        totalTasksAll++;
+
+        if(ch.tasks[k]){
+          totalTasksCompleted++;
+        }
+
+      });
+
+    });
+
+  });
+
+
+  var tiles = [
+
+    {
+      v:stats.overallPct + "%",
+      k:"Overall progress"
+    },
+
+    {
+      v:subjectPct("physics") + "%",
+      k:"Physics progress"
+    },
+
+    {
+      v:subjectPct("chemistry") + "%",
+      k:"Chemistry progress"
+    },
+
+    {
+      v:subjectPct("maths") + "%",
+      k:"Mathematics progress"
+    },
+
+    {
+      v:stats.completedChapters,
+      k:"Chapters completed"
+    },
+
+    {
+      v:stats.remainingChapters,
+      k:"Chapters remaining"
+    },
+
+    {
+      v:
+        totalTasksCompleted +
+        "/" +
+        totalTasksAll,
+      k:"Total tasks completed"
+    },
+
+    {
+      v:todayTaskCount(),
+      k:"Tasks completed today"
+    }
+
+  ];
+
+
+  statGrid.innerHTML =
+    tiles.map(function(t){
+
+      return (
+        '<div class="card stat-tile">' +
+
+        '<div class="stat-val mono">' +
+        t.v +
+        '</div>' +
+
+        '<div class="stat-key">' +
+        t.k +
+        '</div>' +
+
+        '</div>'
+      );
+
+    }).join("");
+
+}
+
+
+/* ============================= SUBJECT UI STATE ============================= */
+
+var subjectUiState = {
+
+  physics:{
+    search:"",
+    filter:"all",
+    weightage:"high",
+    addOpen:false,
+    editingId:null
+  },
+
+  chemistry:{
+    search:"",
+    filter:"all",
+    weightage:"high",
+    addOpen:false,
+    editingId:null
+  },
+
+  maths:{
+    search:"",
+    filter:"all",
+    weightage:"high",
+    addOpen:false,
+    editingId:null
+  }
+
+};
+
+
+function segColor(subj){
+  return "var(--" + subj + ")";
+}
+
+
+function colorSoft(subj){
+  return "var(--" + subj + "-soft)";
+}
+
+
+/* ============================= CHAPTER CARD ============================= */
+
+function renderChapterCard(subj,ch){
+
+  var pct =
+    chapterPct(ch);
+
+  var ui =
+    subjectUiState[subj];
+
+  var isEditing =
+    ui.editingId === ch.id;
+
+
+  var nameHtml =
+    isEditing
+
+    ? '<input class="chapter-name-input" ' +
+      'data-action="name-input" ' +
+      'value="' +
+      escapeAttr(ch.name) +
+      '">'
+
+    : '<span class="chapter-name">' +
+      escapeHtml(ch.name) +
+      '</span>';
+
+
+  var actionsHtml =
+    isEditing
+
+    ? (
+      '<button class="icon-btn" ' +
+      'data-action="save-name" ' +
+      'title="Save">' +
+
+      '<svg viewBox="0 0 24 24" ' +
+      'fill="none" ' +
+      'stroke="currentColor" ' +
+      'stroke-width="2.2" ' +
+      'stroke-linecap="round" ' +
+      'stroke-linejoin="round">' +
+
+      ICON_CHECK +
+
+      '</svg>' +
+
+      '</button>'
+    )
+
+    : (
+      '<button class="icon-btn" ' +
+      'data-action="edit-name" ' +
+      'title="Edit">' +
+
+      '<svg viewBox="0 0 24 24" ' +
+      'fill="none" ' +
+      'stroke="currentColor" ' +
+      'stroke-width="2" ' +
+      'stroke-linecap="round" ' +
+      'stroke-linejoin="round">' +
+
+      ICON_EDIT +
+
+      '</svg>' +
+
+      '</button>' +
+
+      '<button class="icon-btn danger" ' +
+      'data-action="delete-chapter" ' +
+      'title="Delete">' +
+
+      '<svg viewBox="0 0 24 24" ' +
+      'fill="none" ' +
+      'stroke="currentColor" ' +
+      'stroke-width="2" ' +
+      'stroke-linecap="round" ' +
+      'stroke-linejoin="round">' +
+
+      ICON_TRASH +
+
+      '</svg>' +
+
+      '</button>'
+    );
+
+
+  var segsHtml =
+    TASK_KEYS.map(function(k){
+
+      var on =
+        ch.tasks[k];
+
+      return (
+        '<span class="seg" ' +
+        'style="' +
+        (
+          on
+          ? 'background:' +
+            segColor(subj)
+          : ''
+        ) +
+        '">' +
+        '</span>'
+      );
+
+    }).join("");
+
+
+  var chipsHtml =
+    TASK_KEYS.map(function(k){
+
+      var on =
+        ch.tasks[k];
+
+      return (
+
+        '<label class="check-chip ' +
+        (on ? 'checked' : '') +
+        '" ' +
+
+        'data-action="toggle-task" ' +
+        'data-task="' +
+        k +
+        '" ' +
+
+        'style="' +
+
+        (
+          on
+          ? 'background:' +
+            colorSoft(subj) +
+            ';border-color:' +
+            segColor(subj)
+          : ''
+        ) +
+
+        '">' +
+
+        '<span class="box" ' +
+
+        'style="' +
+
+        (
+          on
+          ? 'border-color:' +
+            segColor(subj) +
+            ';background:' +
+            segColor(subj)
+          : ''
+        ) +
+
+        '">' +
+
+        '<svg viewBox="0 0 24 24" ' +
+        'fill="none" ' +
+        'stroke="' +
+        (on ? '#fff' : 'currentColor') +
+        '" ' +
+        'stroke-width="3" ' +
+        'stroke-linecap="round" ' +
+        'stroke-linejoin="round">' +
+
+        ICON_CHECK +
+
+        '</svg>' +
+
+        '</span>' +
+
+        TASK_LABELS[k] +
+
+        '</label>'
+      );
+
+    }).join("");
+
+
+  return (
+
+    '<div class="card chapter-card" ' +
+    'data-id="' +
+    ch.id +
+    '">' +
+
+      '<div class="chapter-top">' +
+
+        '<div class="chapter-name-row">' +
+        nameHtml +
+        '</div>' +
+
+        '<div class="chapter-actions">' +
+        actionsHtml +
+        '</div>' +
+
+      '</div>' +
+
+
+      '<div class="chapter-pct-row">' +
+
+        '<span class="chapter-pct mono">' +
+        pct +
+        '%' +
+        '</span>' +
+
+        '<div class="segbar">' +
+        segsHtml +
+        '</div>' +
+
+      '</div>' +
+
+
+      '<div class="checklist">' +
+      chipsHtml +
+      '</div>' +
+
+
+      '<div class="revised-row">' +
+
+        '<span class="revised-label">' +
+        'Last revised' +
+        '</span>' +
+
+        '<input ' +
+        'type="date" ' +
+        'class="revised-input" ' +
+        'data-action="revised-date" ' +
+        'value="' +
+        (ch.lastRevised || "") +
+        '">' +
+
+      '</div>' +
+
+    '</div>'
+  );
+
+}
+
+
+/* ============================= ESCAPE ============================= */
+
+function escapeHtml(s){
+
+  return String(s).replace(
+    /[&<>"']/g,
+    function(c){
+
+      return {
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[c];
+
+    }
+  );
+
+}
+
+
+function escapeAttr(s){
+  return escapeHtml(s);
+}
+
+
+/* ============================= SUBJECT RENDER ============================= */
+
+function renderSubjectPage(subj){
+
+  var ui =
+    subjectUiState[subj];
+
+  var list =
+    state.subjects[subj].slice();
+
+
+  document.getElementById(
+    subj + "HeadPct"
+  ).textContent =
+    subjectPct(subj) + "%";
+
+
+  var filtered =
+    list.filter(function(ch){
+
+      var matchesSearch =
+        ch.name
+          .toLowerCase()
+          .indexOf(
+            ui.search.toLowerCase()
+          ) !== -1;
+
+      if(!matchesSearch){
+        return false;
+      }
+
+      if(ui.filter === "pending"){
+        if(isChapterComplete(ch)){
+          return false;
+        }
+      }
+
+      if(ui.filter === "done"){
+        if(!isChapterComplete(ch)){
+          return false;
+        }
+      }
+
+      return true;
+
+    });
+
+
+  var weightFiltered =
+    filtered.filter(function(ch){
+
+      return ch.weightage === ui.weightage;
+
+    });
+
+
+  var listEl =
+    document.getElementById(
+      subj + "List"
+    );
+
+
+  var highCount =
+    list.filter(function(ch){
+      return ch.weightage === "high";
+    }).length;
+
+  var lowCount =
+    list.filter(function(ch){
+      return ch.weightage === "low";
+    }).length;
+
+
+  var heading =
+    ui.weightage === "high"
+    ? "High Weightage"
+    : "Low Weightage";
+
+
+  var count =
+    ui.weightage === "high"
+    ? highCount
+    : lowCount;
+
+
+  if(!weightFiltered.length){
+
+    listEl.innerHTML =
+
+      '<div class="weightage-section">' +
+
+        '<div class="weightage-heading">' +
+
+          '<span class="weightage-heading-title">' +
+          heading +
+          '</span>' +
+
+          '<span class="weightage-count mono">' +
+          count +
+          ' chapters' +
+          '</span>' +
+
+        '</div>' +
+
+        '<div class="empty-state">' +
+
+        (
+          list.length
+          ? 'No chapters found. Try adjusting your search or filter.'
+          : 'No chapters here yet. Add a new chapter above.'
+        ) +
+
+        '</div>' +
+
+      '</div>';
+
+  }else{
+
+    listEl.innerHTML =
+
+      '<div class="weightage-section">' +
+
+        '<div class="weightage-heading">' +
+
+          '<span class="weightage-heading-title">' +
+          heading +
+          '</span>' +
+
+          '<span class="weightage-count mono">' +
+          count +
+          ' chapters' +
+          '</span>' +
+
+        '</div>' +
+
+        '<div class="chapter-list">' +
+
+        weightFiltered.map(function(ch){
+
+          return renderChapterCard(
+            subj,
+            ch
+          );
+
+        }).join("") +
+
+        '</div>' +
+
+      '</div>';
+
+  }
+
+
+  var addFormEl =
+    document.getElementById(
+      subj + "AddForm"
+    );
+
+
+  if(ui.addOpen){
+
+    addFormEl.innerHTML =
+
+      '<div class="add-form">' +
+
+        '<input ' +
+        'class="search-input" ' +
+        'id="' +
+        subj +
+        'NewName" ' +
+        'placeholder="New chapter name" ' +
+        'autofocus>' +
+
+        '<button ' +
+        'class="btn btn-primary btn-sm" ' +
+        'data-action="confirm-add">' +
+        'Add' +
+        '</button>' +
+
+        '<button ' +
+        'class="btn btn-sm" ' +
+        'data-action="cancel-add">' +
+        'Cancel' +
+        '</button>' +
+
+      '</div>';
+
+
+    var inp =
+      document.getElementById(
+        subj + "NewName"
+      );
+
+    if(inp){
+      inp.focus();
+    }
+
+  }else{
+
+    addFormEl.innerHTML = "";
+
+  }
+
+}
+
+
+/* ============================= GOAL ============================= */
+
+function renderGoal(){
+
+  document.getElementById(
+    "examDateInput"
+  ).value =
+    state.goal.examDate || "";
+
+
+  document.getElementById(
+    "percentileInput"
+  ).value =
+    state.goal.percentile || "";
+
+
+  var days =
+    daysUntil(
+      state.goal.examDate
+    );
+
+  var numEl =
+    document.getElementById(
+      "goalCountdownNum"
+    );
+
+  var txtEl =
+    document.getElementById(
+      "goalCountdownTxt"
+    );
+
+
+  if(days === null){
+
+    numEl.textContent = "—";
+
+    txtEl.textContent =
+      "Set a date to start the countdown";
+
+  }else if(days < 0){
+
+    numEl.textContent = "0";
+
+    txtEl.textContent =
+      "Exam date has passed";
+
+  }else{
+
+    numEl.textContent = days;
+
+    txtEl.textContent =
+      days === 1
+      ? "day remaining until your exam"
+      : "days remaining until your exam";
+
+  }
+
+}
+
+
+/* ============================= RENDER ALL ============================= */
+
+function renderAll(){
+
+  renderDashboard();
+
+  [
+    "physics",
+    "chemistry",
+    "maths"
+  ].forEach(renderSubjectPage);
+
+  renderGoal();
+
+}
+
+
+/* ============================= TABS ============================= */
+
+document.getElementById("tabs")
+.addEventListener(
+  "click",
+  function(e){
+
+    var btn =
+      e.target.closest(".tab-btn");
+
+    if(!btn){
+      return;
+    }
+
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach(function(b){
+        b.classList.remove("active");
+      });
+
+    btn.classList.add("active");
+
+
+    document
+      .querySelectorAll(".panel")
+      .forEach(function(p){
+        p.classList.remove("active");
+      });
+
+
+    document
+      .getElementById(
+        "panel-" + btn.dataset.tab
+      )
+      .classList.add("active");
+
+
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+
+  }
+);
+
+
+/* ============================= SET DATE CTA ============================= */
+
+document.getElementById("setDateCta")
+.addEventListener(
+  "click",
+  function(e){
+
+    e.preventDefault();
+
+    document
+      .querySelector(
+        '.tab-btn[data-tab="goal"]'
+      )
+      .click();
+
+  }
+);
+
+
+/* ============================= THEME ============================= */
+
+function applyTheme(theme){
+
+  document.documentElement
+    .classList.toggle(
+      "dark",
+      theme === "dark"
+    );
+
+  document.getElementById(
+    "themeIcon"
+  ).innerHTML =
+    theme === "dark"
+    ? ICON_SUN
+    : ICON_MOON;
+
+}
+
+
+var savedTheme =
+  localStorage.getItem(
+    THEME_KEY
+  );
+
+var prefersDark =
+  window.matchMedia &&
+  window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches;
+
+var currentTheme =
+  savedTheme ||
+  (prefersDark ? "dark" : "light");
+
+applyTheme(currentTheme);
+
+
+document.getElementById("themeToggle")
+.addEventListener(
+  "click",
+  function(){
+
+    currentTheme =
+      currentTheme === "dark"
+      ? "light"
+      : "dark";
+
+    applyTheme(currentTheme);
+
+    localStorage.setItem(
+      THEME_KEY,
+      currentTheme
+    );
+
+  }
+);
+
+
+/* ============================= SUBJECT PANELS ============================= */
+
+function setupSubjectPanel(subj){
+
+  var ui =
+    subjectUiState[subj];
+
+
+  /* SEARCH */
+
+  document.getElementById(
+    subj + "Search"
+  ).addEventListener(
+    "input",
+    function(e){
+
+      ui.search =
+        e.target.value;
+
+      renderSubjectPage(subj);
+
+    }
+  );
+
+
+  /* PENDING / DONE FILTER */
+
+  document
+    .querySelector(
+      '.filter-seg[data-subject="' +
+      subj +
+      '"]'
+    )
+    .addEventListener(
+      "click",
+      function(e){
+
+        var b =
+          e.target.closest("button");
+
+        if(!b){
+          return;
+        }
+
+        ui.filter =
+          b.dataset.filter;
+
+        this
+          .querySelectorAll("button")
+          .forEach(function(x){
+            x.classList.remove("active");
+          });
+
+        b.classList.add("active");
+
+        renderSubjectPage(subj);
+
+      }
+    );
+
+
+  /* HIGH / LOW WEIGHTAGE */
+
+  document
+    .querySelector(
+      '[data-weightage-subject="' +
+      subj +
+      '"]'
+    )
+    .addEventListener(
+      "click",
+      function(e){
+
+        var b =
+          e.target.closest(
+            ".weightage-btn"
+          );
+
+        if(!b){
+          return;
+        }
+
+        ui.weightage =
+          b.dataset.weightage;
+
+        this
+          .querySelectorAll(
+            ".weightage-btn"
+          )
+          .forEach(function(x){
+            x.classList.remove(
+              "active"
+            );
+          });
+
+        b.classList.add("active");
+
+        renderSubjectPage(subj);
+
+      }
+    );
+
+
+  /* ADD BUTTON */
+
+  document.getElementById(
+    subj + "AddBtn"
+  ).addEventListener(
+    "click",
+    function(){
+
+      ui.addOpen = true;
+
+      renderSubjectPage(subj);
+
+    }
+  );
+
+
+  /* ADD FORM */
+
+  document.getElementById(
+    subj + "AddForm"
+  ).addEventListener(
+    "click",
+    function(e){
+
+      var action =
+        e.target.closest(
+          "[data-action]"
+        );
+
+      if(!action){
+        return;
+      }
+
+
+      if(
+        action.dataset.action ===
+        "confirm-add"
+      ){
+
+        var inp =
+          document.getElementById(
+            subj + "NewName"
+          );
+
+        var name =
+          inp.value.trim();
+
+        if(name){
+
+          state.subjects[subj].push(
+            makeChapter(
+              name,
+              ui.weightage
+            )
+          );
+
+          save();
+
+        }
+
+        ui.addOpen = false;
+
+        renderAll();
+
+      }
+
+
+      else if(
+        action.dataset.action ===
+        "cancel-add"
+      ){
+
+        ui.addOpen = false;
+
+        renderSubjectPage(subj);
+
+      }
+
+    }
+  );
+
+
+  /* ENTER / ESCAPE IN ADD FORM */
+
+  document.getElementById(
+    subj + "AddForm"
+  ).addEventListener(
+    "keydown",
+    function(e){
+
+      if(
+        e.key === "Enter" &&
+        e.target.id ===
+        subj + "NewName"
+      ){
+
+        document
+          .querySelector(
+            '#' +
+            subj +
+            'AddForm [data-action="confirm-add"]'
+          )
+          .click();
+
+      }
+
+      else if(
+        e.key === "Escape" &&
+        e.target.id ===
+        subj + "NewName"
+      ){
+
+        document
+          .querySelector(
+            '#' +
+            subj +
+            'AddForm [data-action="cancel-add"]'
+          )
+          .click();
+
+      }
+
+    }
+  );
+
+
+  /* CHAPTER LIST */
+
+  var listEl =
+    document.getElementById(
+      subj + "List"
+    );
+
+
+  listEl.addEventListener(
+    "click",
+    function(e){
+
+      var card =
+        e.target.closest(
+          ".chapter-card"
+        );
+
+      if(!card){
+        return;
+      }
+
+
+      var id =
+        card.dataset.id;
+
+
+      var chapter =
+        state.subjects[subj]
+        .find(function(c){
+          return c.id === id;
+        });
+
+
+      if(!chapter){
+        return;
+      }
+
+
+      /* TOGGLE DONE / REVISED */
+
+      var chip =
+        e.target.closest(
+          '[data-action="toggle-task"]'
+        );
+
+
+      if(chip){
+
+        var task =
+          chip.dataset.task;
+
+        var newVal =
+          !chapter.tasks[task];
+
+        chapter.tasks[task] =
+          newVal;
+
+        chapter.completedAt[task] =
+          newVal
+          ? Date.now()
+          : null;
+
+
+        /*
+          When Revised is checked,
+          automatically record today's date
+          in Last revised.
+        */
+
+        if(
+          task === "revised" &&
+          newVal
+        ){
+
+          var d =
+            new Date();
+
+          var yyyy =
+            d.getFullYear();
+
+          var mm =
+            String(
+              d.getMonth()+1
+            ).padStart(2,"0");
+
+          var dd =
+            String(
+              d.getDate()
+            ).padStart(2,"0");
+
+          chapter.lastRevised =
+            yyyy +
+            "-" +
+            mm +
+            "-" +
+            dd;
+
+        }
+
+
+        save();
+
+        renderAll();
+
+        return;
+      }
+
+
+      /* EDIT */
+
+      var editBtn =
+        e.target.closest(
+          '[data-action="edit-name"]'
+        );
+
+
+      if(editBtn){
+
+        ui.editingId =
+          id;
+
+        renderSubjectPage(subj);
+
+        var inputEl =
+          listEl.querySelector(
+            ".chapter-name-input"
+          );
+
+        if(inputEl){
+
+          inputEl.focus();
+          inputEl.select();
+
+        }
+
+        return;
+      }
+
+
+      /* SAVE NAME */
+
+      var saveBtn =
+        e.target.closest(
+          '[data-action="save-name"]'
+        );
+
+
+      if(saveBtn){
+
+        var nameInput =
+          card.querySelector(
+            '[data-action="name-input"]'
+          );
+
+        var newName =
+          nameInput.value.trim();
+
+        if(newName){
+
+          chapter.name =
+            newName;
+
+        }
+
+        ui.editingId =
+          null;
+
+        save();
+
+        renderAll();
+
+        return;
+      }
+
+
+      /* DELETE */
+
+      var delBtn =
+        e.target.closest(
+          '[data-action="delete-chapter"]'
+        );
+
+
+      if(delBtn){
+
+        if(
+          window.confirm(
+            'Delete "' +
+            chapter.name +
+            '"? This cannot be undone.'
+          )
+        ){
+
+          state.subjects[subj] =
+            state.subjects[subj]
+            .filter(function(c){
+              return c.id !== id;
+            });
+
+          save();
+
+          renderAll();
+
+        }
+
+        return;
+      }
+
+    }
+  );
+
+
+  /* ENTER / ESCAPE EDIT NAME */
+
+  listEl.addEventListener(
+    "keydown",
+    function(e){
+
+      if(
+        e.key === "Enter" &&
+        e.target.matches(
+          '[data-action="name-input"]'
+        )
+      ){
+
+        var card =
+          e.target.closest(
+            ".chapter-card"
+          );
+
+        card
+          .querySelector(
+            '[data-action="save-name"]'
+          )
+          .click();
+
+      }
+
+      else if(
+        e.key === "Escape" &&
+        e.target.matches(
+          '[data-action="name-input"]'
+        )
+      ){
+
+        ui.editingId =
+          null;
+
+        renderSubjectPage(subj);
+
+      }
+
+    }
+  );
+
+
+  /* LAST REVISED DATE */
+
+  listEl.addEventListener(
+    "change",
+    function(e){
+
+      if(
+        e.target.matches(
+          '[data-action="revised-date"]'
+        )
+      ){
+
+        var card =
+          e.target.closest(
+            ".chapter-card"
+          );
+
+        var id2 =
+          card.dataset.id;
+
+        var chapter2 =
+          state.subjects[subj]
+          .find(function(c){
+            return c.id === id2;
+          });
+
+
+        if(chapter2){
+
+          chapter2.lastRevised =
+            e.target.value;
+
+          save();
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ============================= INITIALIZE SUBJECTS ============================= */
+
+[
+  "physics",
+  "chemistry",
+  "maths"
+].forEach(
+  setupSubjectPanel
+);
+
+
+/* ============================= GOAL EVENTS ============================= */
+
+document.getElementById(
+  "examDateInput"
+).addEventListener(
+  "change",
+  function(e){
+
+    state.goal.examDate =
+      e.target.value;
+
+    save();
+
+    renderAll();
+
+  }
+);
+
+
+document.getElementById(
+  "percentileInput"
+).addEventListener(
+  "input",
+  function(e){
+
+    state.goal.percentile =
+      e.target.value;
+
+    save();
+
+  }
+);
+
+
+/* ============================= EXPORT ============================= */
+
+document.getElementById(
+  "exportBtn"
+).addEventListener(
+  "click",
+  function(){
+
+    var blob =
+      new Blob(
+        [
+          JSON.stringify(
+            state,
+            null,
+            2
+          )
+        ],
+        {
+          type:
+            "application/json"
+        }
+      );
+
+
+    var url =
+      URL.createObjectURL(blob);
+
+
+    var a =
+      document.createElement("a");
+
+
+    var dateTag =
+      new Date()
+      .toISOString()
+      .slice(0,10);
+
+
+    a.href = url;
+
+    a.download =
+      "jee-tracker-backup-" +
+      dateTag +
+      ".json";
+
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+  }
+);
+
+
+/* ============================= IMPORT ============================= */
+
+document.getElementById(
+  "importBtn"
+).addEventListener(
+  "click",
+  function(){
+
+    document
+      .getElementById("importFile")
+      .click();
+
+  }
+);
+
+
+document.getElementById(
+  "importFile"
+).addEventListener(
+  "change",
+  function(e){
+
+    var file =
+      e.target.files[0];
+
+    if(!file){
+      return;
+    }
+
+
+    var reader =
+      new FileReader();
+
+
+    reader.onload =
+      function(ev){
+
+        try{
+
+          var parsed =
+            JSON.parse(
+              ev.target.result
+            );
+
+
+          if(
+            !parsed.subjects ||
+            !parsed.goal
+          ){
+
+            throw new Error(
+              "Invalid file"
+            );
+
+          }
+
+
+          [
+            "physics",
+            "chemistry",
+            "maths"
+          ].forEach(function(s){
+
+            if(
+              !Array.isArray(
+                parsed.subjects[s]
+              )
+            ){
+
+              parsed.subjects[s] = [];
+
+            }
+
+
+            parsed.subjects[s] =
+              parsed.subjects[s]
+              .map(function(ch){
+
+                return migrateChapter(
+                  ch,
+                  s
+                );
+
+              });
+
+          });
+
+
+          if(
+            !parsed.goal.examDate
+          ){
+
+            parsed.goal.examDate =
+              "";
+
+          }
+
+
+          if(
+            parsed.goal.percentile ===
+            undefined
+          ){
+
+            parsed.goal.percentile =
+              "";
+
+          }
+
+
+          state =
+            parsed;
+
+          save();
+
+          renderAll();
+
+          alert(
+            "Data imported successfully."
+          );
+
+
+        }catch(err){
+
+          alert(
+            "Could not import this file. Please make sure it's a valid JEE Tracker export."
+          );
+
+        }
+
+
+        e.target.value = "";
+
+      };
+
+
+    reader.readAsText(file);
+
+  }
+);
+
+
+/* ============================= RESET ============================= */
+
+document.getElementById(
+  "resetBtn"
+).addEventListener(
+  "click",
+  function(){
+
+    if(
+      window.confirm(
+        "This will permanently delete all your progress and reset to the default syllabus. Continue?"
+      )
+    ){
+
+      state =
+        seedData();
+
+      save();
+
+      renderAll();
+
+    }
+
+  }
+);
+
+
+/* ============================= INIT ============================= */
+
+renderAll();
+
+})();
+</script>
+
+</body>
+</html>
